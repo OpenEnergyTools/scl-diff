@@ -12,6 +12,7 @@ const testScl = new DOMParser().parseFromString(
         <![CDATA[some comment]]>
         <IED name="somePrivateIED"/>
       </Private>
+      <Text>Some detailed description</Text>
       <ens:SomeNonSCLElement />
     </SCL>`,
   "application/xml"
@@ -20,6 +21,7 @@ const testScl = new DOMParser().parseFromString(
 const privateElement = testScl.querySelector("Private")!;
 const sclElement = testScl.querySelector("SCL")!;
 const SomeNonSCLElement = testScl.querySelector("SomeNonSCLElement")!;
+const textElement = testScl.querySelector("Text")!;
 
 describe("Describe SCL elements function", () => {
   it("returns undefined with missing describe function", () =>
@@ -34,4 +36,9 @@ describe("Describe SCL elements function", () => {
         <![CDATA[some comment]]>
         <IED name="somePrivateIED"/>
       </Private>`));
+
+  it("returns outerHTML for SCL element Text ", () =>
+    expect(describeSclElement(textElement)).to.equal(
+      `<Text xmlns="http://www.iec.ch/61850/2003/SCL">Some detailed description</Text>`
+    ));
 });

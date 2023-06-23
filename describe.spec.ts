@@ -14,6 +14,11 @@ const testScl = new DOMParser().parseFromString(
       </Private>
       <Text>Some detailed description</Text>
       <ens:SomeNonSCLElement />
+      <DataTypeTemplates>
+        <EnumType id="someId">
+            <EnumVal ord="1" desc="someDesc">A</EnumVal>
+        </EnumType>
+    </DataTypeTemplates>
     </SCL>`,
   "application/xml"
 );
@@ -22,6 +27,7 @@ const privateElement = testScl.querySelector("Private")!;
 const sclElement = testScl.querySelector("SCL")!;
 const SomeNonSCLElement = testScl.querySelector("SomeNonSCLElement")!;
 const textElement = testScl.querySelector("Text")!;
+const enumValElement = testScl.querySelector("EnumVal")!;
 
 describe("Describe SCL elements function", () => {
   it("returns undefined with missing describe function", () =>
@@ -41,4 +47,11 @@ describe("Describe SCL elements function", () => {
     expect(describeSclElement(textElement)).to.equal(
       `<Text xmlns="http://www.iec.ch/61850/2003/SCL">Some detailed description</Text>`
     ));
+
+  it("returns EnumValDescription for SCL element EnumVal ", () =>
+    expect(describeSclElement(enumValElement)).to.deep.equal({
+      ord: 1,
+      desc: "someDesc",
+      content: "A",
+    }));
 });

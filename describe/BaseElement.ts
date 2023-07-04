@@ -12,6 +12,28 @@ export interface BaseElementDescription {
   eNSAttributes: ExtensionNSAttributes;
 }
 
+function sortENsAttributes(
+  eNsAttributes: ExtensionNSAttributes
+): ExtensionNSAttributes {
+  return Object.keys(eNsAttributes)
+    .sort()
+    .reduce((accURIs: ExtensionNSAttributes, key) => {
+      const eNsAttribute = eNsAttributes[key];
+
+      const sortedENsAttribute = Object.keys(eNsAttribute)
+        .sort()
+        .reduce((accAttributes: Record<string, string | null>, key) => {
+          accAttributes[key] = eNsAttribute[key];
+
+          return accAttributes;
+        }, {});
+
+      accURIs[key] = sortedENsAttribute;
+
+      return accURIs;
+    }, {});
+}
+
 export function describeBaseElement(element: Element): BaseElementDescription {
   const baseElement: BaseElementDescription = {
     privates: [],
@@ -24,14 +46,16 @@ export function describeBaseElement(element: Element): BaseElementDescription {
     if (child.tagName === "Text") baseElement.texts.push(Text(child));
   });
 
+  const eNsAttributes: ExtensionNSAttributes = {};
   Array.from(element.attributes).forEach((attr) => {
     if (attr.namespaceURI) {
-      if (!baseElement.eNSAttributes[attr.namespaceURI])
-        baseElement.eNSAttributes[attr.namespaceURI] = {};
+      if (!eNsAttributes[attr.namespaceURI])
+        eNsAttributes[attr.namespaceURI] = {};
 
-      baseElement.eNSAttributes[attr.namespaceURI][attr.name] = attr.value;
+      eNsAttributes[attr.namespaceURI][attr.name] = attr.value;
     }
   });
+  baseElement.eNSAttributes = sortENsAttributes(eNsAttributes);
 
   return baseElement;
 }

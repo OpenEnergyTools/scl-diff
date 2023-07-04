@@ -69,20 +69,32 @@ describe("Description for SCL schema element tBaseElement", () => {
   });
 
   it("returns same description with semantically equal EnumType's", () =>
-    expect(EnumType(baseEnumType)).to.deep.equal(EnumType(equalEnumType)));
+    expect(JSON.stringify(EnumType(baseEnumType))).to.equal(
+      JSON.stringify(EnumType(equalEnumType))
+    ));
 
   it("returns different description with unequal EnumType desc attribute", () =>
-    expect(EnumType(baseEnumType)).to.not.deep.equal(EnumType(diffEnumVal1)));
+    expect(JSON.stringify(EnumType(baseEnumType))).to.not.equal(
+      JSON.stringify(EnumType(diffEnumVal1))
+    ));
 
   it("returns different description with unequal EnumVal desc attribute", () =>
-    expect(EnumType(baseEnumType)).to.not.deep.equal(EnumType(diffEnumVal2)));
+    expect(JSON.stringify(EnumType(baseEnumType))).to.not.equal(
+      JSON.stringify(EnumType(diffEnumVal2))
+    ));
 
   it("returns different description with unequal EnumVal ord attributes", () =>
-    expect(EnumType(baseEnumType)).to.not.deep.equal(EnumType(diffEnumVal3)));
+    expect(JSON.stringify(EnumType(baseEnumType))).to.not.equal(
+      JSON.stringify(EnumType(diffEnumVal3))
+    ));
 
   it("returns different description with unequal Private child element order", () =>
-    expect(EnumType(baseEnumType)).to.not.deep.equal(EnumType(diffEnumVal4)));
+    expect(JSON.stringify(EnumType(baseEnumType))).to.not.equal(
+      JSON.stringify(EnumType(diffEnumVal4))
+    ));
 
   it("ignore schema invalid ord definition", () =>
-    expect(EnumType(baseEnumType)).to.deep.equal(EnumType(diffEnumVal5)));
+    expect(JSON.stringify(EnumType(baseEnumType))).to.equal(
+      JSON.stringify(EnumType(diffEnumVal5))
+    ));
 });

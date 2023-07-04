@@ -56,12 +56,12 @@ describe("Describe SCL elements function", () => {
     expect(describeSclElement(sclElement)).to.be.undefined);
 
   it("return equal description with semantically equal SCL element", () =>
-    expect(describeSclElement(baseEnumType)).to.deep.equal(
-      describeSclElement(equalEnumType)
+    expect(JSON.stringify(describeSclElement(baseEnumType))).to.equal(
+      JSON.stringify(describeSclElement(equalEnumType))
     ));
 
   it("return different description with semantically unequal SCL element", () =>
-    expect(describeSclElement(diffEnumType)).to.not.deep.equal(
-      describeSclElement(equalEnumType)
+    expect(JSON.stringify(describeSclElement(diffEnumType))).to.not.equal(
+      JSON.stringify(describeSclElement(equalEnumType))
     ));
 });

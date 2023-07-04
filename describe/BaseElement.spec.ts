@@ -40,7 +40,14 @@ const scl = new DOMParser().parseFromString(
         <EnumVal ord="-1">SomeContent</EnumVal>
         <EnumVal ord="13">SomeOtherContent</EnumVal>
       </EnumType>
-      <EnumType id="someOtherEqual" sxy:x="1" ens:some="someOtherNamespace"  sxy:y="3">
+      <EnumType id="someDifferent4" desc="someDesc" sxy:y="3" ens:some="someOtherNamespace" sxy:x="1">
+        <Private type="somePrivate">SomePrivateContent</Private>
+        <Private type="someOtherPrivate">SomeOtherPrivateContent</Private>
+        <Text>SomeTextContent</Text>
+        <EnumVal ord="-1">SomeContent</EnumVal>
+        <EnumVal ord="13">SomeOtherContent</EnumVal>
+      </EnumType>
+      <EnumType id="someOtherEqual" ens:some="someOtherNamespace" sxy:x="1" sxy:y="3">
         <Text>SomeTextContent</Text>
         <Private type="somePrivate">SomePrivateContent</Private>
         <Private type="someOtherPrivate">SomeOtherPrivateContent</Private>
@@ -56,6 +63,7 @@ const diffElement1 = scl.querySelector("#someDifferent")!;
 const diffElement2 = scl.querySelector("#someDifferent1")!;
 const diffElement3 = scl.querySelector("#someDifferent2")!;
 const diffElement4 = scl.querySelector("#someDifferent3")!;
+const diffElement5 = scl.querySelector("#someDifferent4")!;
 const equalElement = scl.querySelector("#someOtherEqual")!;
 
 describe("Description for SCL element typed tBaseElement", () => {
@@ -86,27 +94,32 @@ describe("Description for SCL element typed tBaseElement", () => {
   });
 
   it("returns same description with semantically equal SCL element", () =>
-    expect(describeBaseElement(baseElement)).to.deep.equal(
-      describeBaseElement(equalElement)
+    expect(JSON.stringify(describeBaseElement(baseElement))).to.equal(
+      JSON.stringify(describeBaseElement(equalElement))
     ));
 
   it("returns different description with unequal extra namespace attributes", () =>
-    expect(describeBaseElement(diffElement1)).to.not.deep.equal(
-      describeBaseElement(equalElement)
+    expect(JSON.stringify(describeBaseElement(diffElement1))).to.not.equal(
+      JSON.stringify(describeBaseElement(equalElement))
     ));
 
   it("returns different description with unequal Private child element", () =>
-    expect(describeBaseElement(diffElement2)).to.not.deep.equal(
-      describeBaseElement(equalElement)
+    expect(JSON.stringify(describeBaseElement(diffElement2))).to.not.equal(
+      JSON.stringify(describeBaseElement(equalElement))
     ));
 
   it("returns different description with unequal Text child element", () =>
-    expect(describeBaseElement(diffElement4)).to.not.deep.equal(
-      describeBaseElement(equalElement)
+    expect(JSON.stringify(describeBaseElement(diffElement4))).to.not.equal(
+      JSON.stringify(describeBaseElement(equalElement))
     ));
 
   it("returns different description with unequal Private child element order", () =>
-    expect(describeBaseElement(diffElement3)).to.not.deep.equal(
-      describeBaseElement(equalElement)
+    expect(JSON.stringify(describeBaseElement(diffElement3))).to.not.equal(
+      JSON.stringify(describeBaseElement(equalElement))
+    ));
+
+  it("is insensitive to any attribute order", () =>
+    expect(JSON.stringify(describeBaseElement(diffElement5))).to.equal(
+      JSON.stringify(describeBaseElement(equalElement))
     ));
 });

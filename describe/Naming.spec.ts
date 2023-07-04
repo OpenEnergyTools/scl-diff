@@ -21,12 +21,12 @@ describe("Description for SCL schema element tBaseElement", () => {
     expect(describeNaming(baseElement)).to.haveOwnProperty("desc", "someDesc"));
 
   it("returns same description with semantically equal Naming type SCL element", () =>
-    expect(describeNaming(baseElement)).to.deep.equal(
-      describeNaming(equalElement)
+    expect(JSON.stringify(describeNaming(baseElement))).to.equal(
+      JSON.stringify(describeNaming(equalElement))
     ));
 
   it("returns different description with unequal Naming type SCL element", () =>
-    expect(describeNaming(diffElement)).to.not.deep.equal(
-      describeNaming(equalElement)
+    expect(JSON.stringify(describeNaming(diffElement))).to.not.equal(
+      JSON.stringify(describeNaming(equalElement))
     ));
 });

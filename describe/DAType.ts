@@ -1,4 +1,3 @@
-import { Description } from "../describe.js";
 import {
   AbstractDataAttributeDescription,
   describeDAorSDAorDAI,

@@ -1,21 +1,11 @@
+import { sortRecord } from "../utils.js";
+
 import { DADescription, describeDA } from "./DADescription.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
 import { SDODescription, describeSDO } from "./SDODescription.js";
 
-function sortRecord(object: Record<string, any>) {
-  return Object.keys(object)
-    .sort()
-    .reduce((sortedRecord: Record<string, any>, key) => {
-      sortedRecord[key] = object[key];
-
-      return sortedRecord;
-    }, {});
-}
-
-export function isDOTypeDescription(
-  type: DOTypeDescription
-): type is DOTypeDescription {
-  return (type as DOTypeDescription).cdc !== undefined;
+export function isDOTypeDescription(type: any): type is DOTypeDescription {
+  return "cdc" in type;
 }
 
 const cdcs = [

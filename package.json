@@ -3,7 +3,7 @@
   "description": "Function library supporting SCL diffing",
   "license": "Apache-2.0",
   "author": "Jakob Vogelsang",
-  "version": "0.0.1-rc1",
+  "version": "0.1.0",
   "type": "module",
   "main": "./dist/describe.js",
   "types": "./dist/describe.d.ts",
@@ -19,7 +19,7 @@
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch --coverage",
-    "doc": "npx rimraf doc && typedoc --out doc index.ts",
+    "doc": "npx rimraf doc && typedoc --out doc describe.ts",
     "deploy": "npm run doc && gh-pages --dist 'doc'",
     "build": "npx rimraf dist && tsc"
   },

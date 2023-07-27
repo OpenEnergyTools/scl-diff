@@ -2,6 +2,11 @@ import { sortRecord } from "../utils.js";
 import { DODescription, describeDO } from "./DODescription.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
 
+export function isLNodeTypeDescription(
+  type: any
+): type is LNodeTypeDescription {
+  return "lnClass" in type && "dos" in type;
+}
 export interface LNodeTypeDescription extends NamingDescription {
   /** Required attribute lnClass */
   lnClass: string;

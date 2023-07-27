@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { describeVal } from "./Val.js";
+import { describeVal, compareBySGroup } from "./Val.js";
 
 const scl = new DOMParser().parseFromString(
   `<SCL
@@ -70,4 +70,26 @@ describe("Describes the SCL element Val", () => {
 
   it("ignores schema invalid sGroup definition", () =>
     expect(describeVal(invalidsGroup)).to.not.haveOwnProperty("sGroup"));
+});
+
+describe("Sort function for ValDescriptions", () => {
+  it("sorts with existing sGroup", () => {
+    const vals = [
+      { sGroup: 2, val: "val2" },
+      { sGroup: 1, val: "val1" },
+      { sGroup: 3, val: "val3" },
+    ];
+
+    expect(vals.sort(compareBySGroup)).to.deep.equal([
+      { sGroup: 1, val: "val1" },
+      { sGroup: 2, val: "val2" },
+      { sGroup: 3, val: "val3" },
+    ]);
+  });
+
+  it("does not sort with missing sGroup", () => {
+    const vals = [{ val: "val2" }, { val: "val1" }, { val: "val3" }];
+
+    expect(vals.sort(compareBySGroup)).to.deep.equal(vals);
+  });
 });

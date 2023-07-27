@@ -7,8 +7,18 @@ import { isDATypeDescription } from "./DAType.js";
 const scl = new DOMParser().parseFromString(
   `<SCL xmlns="http://www.iec.ch/61850/2003/SCL" >
     <DataTypeTemplates>      
-        <DAType id="someEqual" desc="someDesc">     
-          <BDA name="mag" desc="someEqual" bType="Struct" sAddr="someSAddr" type="AnalogueValue"/>
+        <DAType id="baseDAType" desc="someDesc">     
+          <BDA name="mag" desc="desc" bType="Struct" sAddr="someSAddr" type="AnalogueValue">
+            <Val sGroup="1">40.20</Val>
+            <Val sGroup="2">20.20</Val>
+          </BDA>
+          <BDA name="stVal" desc="someEnumBDA" bType="Enum" sAddr="someSAddr" type="someEnumType"/>
+        </DAType>
+        <DAType id="equalDAType" desc="someDesc">     
+          <BDA name="mag" desc="desc" bType="Struct" sAddr="someSAddr" type="AnalogueValue">
+            <Val sGroup="2">20.20</Val>
+            <Val sGroup="1">40.20</Val>
+          </BDA>
           <BDA name="stVal" desc="someEnumBDA" bType="Enum" sAddr="someSAddr" type="someEnumType"/>
         </DAType>
         <DAType id="AnalogueValue">
@@ -17,7 +27,7 @@ const scl = new DOMParser().parseFromString(
             </BDA>
         </DAType>
         <DAType id="daTypeCollection">
-          <BDA name="mag" desc="someEqual" bType="Struct" sAddr="someSAddr" type="AnalogueValue"/>
+          <BDA name="mag" desc="desc" bType="Struct" sAddr="someSAddr" type="AnalogueValue"/>
           <BDA name="cVal" desc="missingBType" />
           <BDA name="hstRangeC" desc="arrayBDA" bType="FLOAT32" count="34" />
           <BDA name="hstVal" desc="refArrayBDA" bType="FLOAT32" count="hstRangeC" />
@@ -41,6 +51,9 @@ const scl = new DOMParser().parseFromString(
   "application/xml"
 );
 
+const baseBDA = scl.querySelector(`#baseDAType>BDA`)!;
+const equalBDA = scl.querySelector(`#equalDAType>BDA`)!;
+
 const orphanBDA = new DOMParser()
   .parseFromString(
     `<BDA name="hstVal" desc="refArrayBDA" bType="FLOAT32" count="hstRangeC" />`,
@@ -57,13 +70,9 @@ const refMissingCount = scl.querySelector(`BDA[desc="missingRefArrayBDA"`)!;
 const refValidCount = scl.querySelector(`BDA[desc="refArrayBDA"`)!;
 const directCount = scl.querySelector(`BDA[desc="arrayBDA"`)!;
 
-const baseBDA = scl.querySelector(`BDA[desc="someEqual"`)!;
 const diffBDA1 = scl.querySelector(`BDA[desc="someDiff1"`)!;
 const diffBDA2 = scl.querySelector(`BDA[desc="someEnumBDA"`)!;
 const diffBDA3 = scl.querySelector(`BDA[desc="someDiff3"`)!;
-const equalBDA = scl.querySelector(
-  `DAType[id="daTypeCollection"] > BDA[desc="someEqual"`
-)!;
 
 describe("Description for SCL schema type tAbstractDataAttribute", () => {
   it("returns property sAddr with existing sAddr attribute", () => {
@@ -121,10 +130,10 @@ describe("Description for SCL schema type tAbstractDataAttribute", () => {
   });
 
   it("returns property val with existing Val children", () => {
-    expect(describeDAorSDAorDAI(diffBDA1).val.length).to.equal(1);
-    expect(describeDAorSDAorDAI(diffBDA3).val.length).to.equal(2);
-    expect(describeDAorSDAorDAI(diffBDA3).val[1].sGroup).to.equal(2);
-    expect(describeDAorSDAorDAI(diffBDA3).val[1].val).to.equal("55.00");
+    expect(describeDAorSDAorDAI(diffBDA1).vals.length).to.equal(1);
+    expect(describeDAorSDAorDAI(diffBDA3).vals.length).to.equal(2);
+    expect(describeDAorSDAorDAI(diffBDA3).vals[1].sGroup).to.equal(2);
+    expect(describeDAorSDAorDAI(diffBDA3).vals[1].val).to.equal("55.00");
   });
 
   it("returns same description with semantically equal BDA's", () =>

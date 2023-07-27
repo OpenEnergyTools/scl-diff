@@ -1,8 +1,7 @@
-import { Description } from "../describe.js";
 import { DAType, DATypeDescription } from "./DAType.js";
 import { EnumType, EnumTypeDescription } from "./EnumType.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
-import { ValDescription, describeVal } from "./Val.js";
+import { ValDescription, describeVal, compareBySGroup } from "./Val.js";
 
 export function isAbstractDataAttributeDescription(
   type: any
@@ -11,7 +10,7 @@ export function isAbstractDataAttributeDescription(
     "bType" in type &&
     "count" in type &&
     "valImport" in type &&
-    "val" in type &&
+    "vals" in type &&
     "valKind" in type
   );
 }
@@ -29,7 +28,7 @@ export interface AbstractDataAttributeDescription extends NamingDescription {
   valImport: boolean;
   /** (B)DA valKind attribute defaulting 0 */
   count: number;
-  val: ValDescription[];
+  vals: ValDescription[];
 }
 
 /** Get count from referenced sibling element */
@@ -59,7 +58,7 @@ export function describeDAorSDAorDAI(
     valKind: "Set",
     valImport: false,
     count: 0,
-    val: [],
+    vals: [],
   };
 
   const [sAddr, valKind, valImport, type, count] = [
@@ -89,9 +88,10 @@ export function describeDAorSDAorDAI(
     // count can be a reference to another sibling that has integer definition
     abstractDataAttributeDesc.count = siblingCount(element, count);
 
-  abstractDataAttributeDesc.val = Array.from(element.children)
+  abstractDataAttributeDesc.vals = Array.from(element.children)
     .filter((child) => child.tagName === "Val")
-    .map((val) => describeVal(val));
+    .map((val) => describeVal(val))
+    .sort(compareBySGroup);
 
   const referencedType = Array.from(
     element.closest("DataTypeTemplates")?.children ?? []

@@ -1,3 +1,11 @@
+/** Sort `ValDescription` by `sGroup` attribute */
+export function compareBySGroup(a: ValDescription, b: ValDescription): number {
+  if (!a.sGroup || !b.sGroup) return 0;
+  else if (a.sGroup < b.sGroup) return -1;
+
+  return 1;
+}
+
 export type ValDescription = {
   /** Optional Val attribute sGroup */
   sGroup?: number;

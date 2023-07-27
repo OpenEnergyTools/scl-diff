@@ -8,7 +8,27 @@ const testScl = new DOMParser().parseFromString(
       xmlns:sxy="http://www.iec.ch/61850/2003/SCLcoordinates"
       xmlns:ens="http://somevalidURI"
     >
+      <IED name="IED">
+        <AccessPoint name="AP1">
+          <Server>
+            <LDevice inst="ldInst">
+              <LN lnClass="XCBR" inst="" lnType="baseXCBR"/>
+              <LN lnClass="XCBR" inst="" lnType="equalXCBR"/>
+              <LN lnClass="XCBR" inst="" lnType="diffXCBR"/>
+            </LDevice>
+          </Server>
+        </AccessPoint>
+      </IED>
       <DataTypeTemplates>
+        <LNodeType lnClass="XCBR" id="equalXCBR" >
+          <DO name="Beh" type="someEqualDOType" />
+        </LNodeType>
+        <LNodeType lnClass="XCBR" id="baseXCBR" >
+          <DO name="Beh" type="someBaseDOType" />
+        </LNodeType>
+        <LNodeType lnClass="XCBR" id="diffXCBR" >
+          <DO name="Beh" type="someDiffDOType" />
+        </LNodeType>
         <DOType cdc="SPS" id="someBaseDOType">
           <DA name="stVal" bType="Struct" fc="ST" type="someBaseDAType" />
         </DOType>
@@ -78,9 +98,9 @@ const baseEnumType = testScl.querySelector("#someID")!;
 const diffEnumType = testScl.querySelector("#someDiffID")!;
 const equalEnumType = testScl.querySelector("#someOtherID")!;
 
-const baseDOType = testScl.querySelector("#someBaseDOType")!;
-const equalDOType = testScl.querySelector("#someEqualDOType")!;
-const diffDOType = testScl.querySelector("#someDiffDOType")!;
+const baseLN = testScl.querySelector(`LN[lnType="baseXCBR"]`)!;
+const equalLN = testScl.querySelector(`LN[lnType="equalXCBR"]`)!;
+const diffLN = testScl.querySelector(`LN[lnType="diffXCBR"]`)!;
 
 describe("Describe SCL elements function", () => {
   it("returns undefined with missing describe function", () =>
@@ -99,13 +119,13 @@ describe("Describe SCL elements function", () => {
       JSON.stringify(describeSclElement(equalEnumType))
     ));
 
-  it("returns same description with semantically equal DOType's", () =>
-    expect(JSON.stringify(describeSclElement(baseDOType))).to.equal(
-      JSON.stringify(describeSclElement(equalDOType))
+  it("returns same description with semantically equal LN's", () =>
+    expect(JSON.stringify(describeSclElement(baseLN))).to.equal(
+      JSON.stringify(describeSclElement(equalLN))
     ));
 
-  it("returns different description with unequal DOType elements", () =>
-    expect(JSON.stringify(describeSclElement(baseDOType))).to.not.equal(
-      JSON.stringify(describeSclElement(diffDOType))
+  it("returns different description with unequal LN elements", () =>
+    expect(JSON.stringify(describeSclElement(baseLN))).to.not.equal(
+      JSON.stringify(describeSclElement(diffLN))
     ));
 });

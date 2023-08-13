@@ -16,6 +16,12 @@ const scl = new DOMParser().parseFromString(
                     </DOI>
                 </LN0>
                 <LN prefix="Meas" lnClass="MMXU" inst="1" lnType="MMXU" >
+                    <DataSet name="baseDataSet" >
+                      <FCDA iedName="IED1" ldInst="lDevice" lnClass="XCBR" lnInst="1" doName="Pos" daName="stVal" fc="ST" />
+                      <FCDA iedName="IED1" ldInst="lDevice" prefix="" lnClass="XCBR" lnInst="1" doName="Pos" daName="q" fc="ST" />
+                      <FCDA iedName="IED1" ldInst="lDevice" lnClass="LLN0" doName="Beh" daName="stVal" fc="ST" />
+                      <FCDA iedName="IED1" ldInst="lDevice" prefix="" lnClass="LLN0" lnInst="" doName="Beh" fc="ST" />
+                    </DataSet>
                     <DOI name="A" >
                         <SDI name="phsA" >
                             <SDI name="cVal" >
@@ -29,6 +35,12 @@ const scl = new DOMParser().parseFromString(
                             </SDI>
                         </SDI>
                     </DOI>
+                    <ReportControl name="report" datSet="baseDataSet" intgPd="0" indexed="true" buffered="true" bufTime="0" confRev="0" >
+                        <TrgOps dchg="false" qchg="false" dupd="false" period="false" gi="false" />
+                        <OptFields seqNum="false" timeStamp="false" dataSet="false" reasonCode="false" dataRef="false" entryID="false" configRef="false" bufOvfl="false"/>
+                        <RptEnabled max="0" />
+                    </ReportControl>
+                    <ReportControl name="anotherReport" />
                 </LN>
                 <LN desc="missingLnType" prefix="" lnClass="PTOC" inst="1" />
                 <LN desc="invalidLnType" prefix="" lnClass="PTOC" inst="1" lnType="invalidPointer"/>
@@ -36,7 +48,16 @@ const scl = new DOMParser().parseFromString(
               </LDevice>
               <LDevice inst="lDevice2">
                 <LN0 lnClass="LLN0" inst="" lnType="LLN02" />
-                <LN prefix="Meas" lnClass="MMXU" inst="1" lnType="MMXU2" />
+                <LN prefix="Meas" lnClass="MMXU" inst="1" lnType="MMXU2" >
+                  <DataSet name="equalDataSet" >
+                    <FCDA iedName="IED1" ldInst="lDevice" prefix="" lnClass="XCBR" lnInst="1" doName="Pos" daName="stVal" fc="ST" />
+                    <FCDA iedName="IED1" ldInst="lDevice" lnClass="XCBR" lnInst="1" doName="Pos" daName="q" fc="ST" />
+                    <FCDA iedName="IED1" ldInst="lDevice" prefix="" lnClass="LLN0" lnInst="" doName="Beh" daName="stVal" fc="ST" />
+                    <FCDA iedName="IED1" ldInst="lDevice" lnClass="LLN0" doName="Beh" fc="ST" />
+                  </DataSet>
+                  <ReportControl name="anotherReport" />
+                  <ReportControl name="report" datSet="equalDataSet" />
+                </LN>
               </LDevice>
               <LDevice inst="lDevice3">
                 <LN0 lnClass="LLN0" inst="" lnType="LLN0" >

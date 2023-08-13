@@ -1,10 +1,33 @@
+import { sortRecord } from "../utils.js";
 import { AbstractDataAttributeDescription } from "./AbstractDataAttribute.js";
 import { LNodeType, LNodeTypeDescription } from "./LNodeType.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
+import {
+  ReportControlDescription,
+  describeReportControl,
+} from "./ReportControl.js";
 import { describeVal, compareBySGroup } from "./Val.js";
 
 export interface LNDescription extends NamingDescription {
+  reports: Record<string, ReportControlDescription>;
   lnType: LNodeTypeDescription;
+}
+
+function reportControls(
+  element: Element
+): Record<string, ReportControlDescription> {
+  const unsortedReports: Record<string, ReportControlDescription> = {};
+
+  Array.from(element.children)
+    .filter((child) => child.tagName === "ReportControl")
+    .forEach((reportControl) => {
+      const name = reportControl.getAttribute("name");
+      const reportDescription = describeReportControl(reportControl);
+      if (name && !unsortedReports[name] && reportDescription)
+        unsortedReports[name] = reportDescription;
+    });
+
+  return sortRecord(unsortedReports);
 }
 
 /** Returns leaf data attribute (BDA or DA) from
@@ -98,5 +121,9 @@ export function LN(element: Element): LNDescription | undefined {
 
   const lnType = updateValues(lNodeTypeDescriptions, instanceValues(element));
 
-  return { ...describeNaming(element), lnType };
+  return {
+    ...describeNaming(element),
+    lnType,
+    reports: reportControls(element),
+  };
 }

@@ -14,6 +14,9 @@ const scl = new DOMParser().parseFromString(
                             <Val>on</Val>
                         </DAI>
                     </DOI>
+                    <Inputs>
+                      <ExtRef intAddr="Beh.t" pLN="LLN0" pDO="Beh" pDA="t" pServT="GOOSE" />
+                    </Inputs>
                 </LN0>
                 <LN prefix="Meas" lnClass="MMXU" inst="1" lnType="MMXU" >
                     <DataSet name="baseDataSet" >
@@ -51,7 +54,11 @@ const scl = new DOMParser().parseFromString(
                 <LN desc="invalidLnTypeDescription" prefix="" lnClass="PTOC" inst="1" lnType="invalidPTOC"/>
               </LDevice>
               <LDevice inst="lDevice2">
-                <LN0 lnClass="LLN0" inst="" lnType="LLN02" />
+                <LN0 lnClass="LLN0" inst="" lnType="LLN02" >
+                  <Inputs>
+                    <ExtRef intAddr="Beh.t" pLN="LLN0" pDO="Beh" pDA="t" pServT="GOOSE" />
+                  </Inputs>
+                </LN0>
                 <LN prefix="Meas" lnClass="MMXU" inst="1" lnType="MMXU2" >
                   <DataSet name="equalDataSet" >
                     <FCDA iedName="IED1" ldInst="lDevice" prefix="" lnClass="XCBR" lnInst="1" doName="Pos" daName="stVal" fc="ST" />
@@ -72,6 +79,9 @@ const scl = new DOMParser().parseFromString(
                       <Val>test</Val>
                     </DAI>
                   </DOI>
+                  <Inputs>
+                      <ExtRef intAddr="A.phsA" pLN="MMXU" pDO="A.phsA" pDA="cVal.mag.f" pServT="SMV" />
+                  </Inputs>
                 </LN0>
                 <LN prefix="Meas" lnClass="MMXU" inst="1" lnType="MMXU" >
                     <DOI name="A" >

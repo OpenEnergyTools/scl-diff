@@ -1,12 +1,14 @@
 import { DADescription } from "./describe/DADescription.js";
 import { DODescription } from "./describe/DODescription.js";
 import { LogControlDescription } from "./describe/LogControl.js";
+import { NamingDescription } from "./describe/Naming.js";
 import { ReportControlDescription } from "./describe/ReportControl.js";
 import { SDODescription } from "./describe/SDODescription.js";
 
 type SortedObjects =
   | DADescription
   | LogControlDescription
+  | NamingDescription
   | SDODescription
   | ReportControlDescription
   | DODescription;

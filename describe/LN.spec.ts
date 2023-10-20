@@ -14,6 +14,8 @@ const scl = new DOMParser().parseFromString(
                             <Val>on</Val>
                         </DAI>
                     </DOI>
+                    <Log name="someLog" />
+                    <Log name="someOtherLog" />
                     <Inputs>
                       <ExtRef intAddr="Beh.t" pLN="LLN0" pDO="Beh" pDA="t" pServT="GOOSE" />
                     </Inputs>
@@ -55,6 +57,8 @@ const scl = new DOMParser().parseFromString(
               </LDevice>
               <LDevice inst="lDevice2">
                 <LN0 lnClass="LLN0" inst="" lnType="LLN02" >
+                  <Log name="someOtherLog" />
+                  <Log name="someLog" />
                   <Inputs>
                     <ExtRef intAddr="Beh.t" pLN="LLN0" pDO="Beh" pDA="t" pServT="GOOSE" />
                   </Inputs>

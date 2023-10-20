@@ -20,6 +20,7 @@ import { describeVal, compareBySGroup } from "./Val.js";
 export interface LNDescription extends NamingDescription {
   reports: Record<string, ReportControlDescription>;
   logControls: Record<string, LogControlDescription>;
+  logs: Record<string, NamingDescription>;
   inputs?: InputsDescription;
   lnType: LNodeTypeDescription;
 }
@@ -88,6 +89,21 @@ function logControls(element: Element): Record<string, LogControlDescription> {
     string,
     LogControlDescription
   >;
+}
+
+function logs(element: Element): Record<string, NamingDescription> {
+  const unsortedLogs: Record<string, NamingDescription> = {};
+
+  Array.from(element.children)
+    .filter((child) => child.tagName === "Log")
+    .forEach((log) => {
+      const name = log.getAttribute("name");
+      const logDescription = describeNaming(log);
+      if (name && !unsortedLogs[name] && logDescription)
+        unsortedLogs[name] = logDescription;
+    });
+
+  return sortRecord(unsortedLogs) as Record<string, NamingDescription>;
 }
 
 /** Returns leaf data attribute (BDA or DA) from
@@ -160,6 +176,7 @@ export function LN(element: Element): LNDescription | undefined {
     ...describeNaming(element),
     reports: reportControls(element),
     logControls: logControls(element),
+    logs: logs(element),
     lnType,
   };
 

@@ -14,15 +14,15 @@ const testScl = new DOMParser().parseFromString(
             <LDevice inst="ldInst1">
               <LN0 lnClass="LLN0" inst="" lnType="baseLLN0"/>
               <LN lnClass="XCBR" inst="1" lnType="baseXCBR"/>
-              <LN lnClass="XCBR" inst="1" lnType="equalXCBR"/>
-              <LN lnClass="XCBR" inst="1" lnType="diffXCBR"/>
             </LDevice>
             <LDevice inst="ldInst2">
               <LN0 lnClass="LLN0" inst="" lnType="equalLLN0"/>
-            </LDevice>
+              <LN lnClass="XCBR" inst="1" lnType="equalXCBR"/>
+              </LDevice>
             <LDevice inst="ldInst3">
               <LN0 lnClass="LLN0" inst="" lnType="diffLLN0"/>
-            </LDevice>
+              <LN lnClass="XCBR" inst="1" lnType="diffXCBR"/>
+              </LDevice>
           </Server>
         </AccessPoint>
       </IED>
@@ -114,13 +114,9 @@ const baseEnumType = testScl.querySelector("#someID")!;
 const diffEnumType = testScl.querySelector("#someDiffID")!;
 const equalEnumType = testScl.querySelector("#someOtherID")!;
 
-const baseLN = testScl.querySelector(`LN[lnType="baseXCBR"]`)!;
-const equalLN = testScl.querySelector(`LN[lnType="equalXCBR"]`)!;
-const diffLN = testScl.querySelector(`LN[lnType="diffXCBR"]`)!;
-
-const baseLN0 = testScl.querySelector(`LDevice[inst="ldInst1"]>LN0`)!;
-const equalLN0 = testScl.querySelector(`LDevice[inst="ldInst2"]>LN0`)!;
-const diffLN0 = testScl.querySelector(`LDevice[inst="ldInst3"]>LN0`)!;
+const baseLDevice = testScl.querySelector(`LDevice[inst="ldInst1"]`)!;
+const equalLDevice = testScl.querySelector(`LDevice[inst="ldInst2"]`)!;
+const diffLDevice = testScl.querySelector(`LDevice[inst="ldInst3"]`)!;
 
 describe("Describe SCL elements function", () => {
   it("returns undefined with missing describe function", () =>
@@ -139,23 +135,13 @@ describe("Describe SCL elements function", () => {
       JSON.stringify(describeSclElement(equalEnumType)),
     ));
 
-  it("returns same description with semantically equal LN0's", () =>
-    expect(JSON.stringify(describeSclElement(baseLN0))).to.equal(
-      JSON.stringify(describeSclElement(equalLN0)),
+  it("returns same description with semantically equal LDevice's", () =>
+    expect(JSON.stringify(describeSclElement(baseLDevice))).to.equal(
+      JSON.stringify(describeSclElement(equalLDevice)),
     ));
 
-  it("returns different description with unequal LN0 elements", () =>
-    expect(JSON.stringify(describeSclElement(baseLN0))).to.not.equal(
-      JSON.stringify(describeSclElement(diffLN0)),
-    ));
-
-  it("returns same description with semantically equal LN's", () =>
-    expect(JSON.stringify(describeSclElement(baseLN))).to.equal(
-      JSON.stringify(describeSclElement(equalLN)),
-    ));
-
-  it("returns different description with unequal LN elements", () =>
-    expect(JSON.stringify(describeSclElement(baseLN))).to.not.equal(
-      JSON.stringify(describeSclElement(diffLN)),
+  it("returns different description with unequal LDevice elements", () =>
+    expect(JSON.stringify(describeSclElement(baseLDevice))).to.not.equal(
+      JSON.stringify(describeSclElement(diffLDevice)),
     ));
 });

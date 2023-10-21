@@ -3,6 +3,7 @@ import { Text, TextDescription } from "./describe/Text.js";
 import { EnumType, EnumTypeDescription } from "./describe/EnumType.js";
 import { DAType, DATypeDescription } from "./describe/DAType.js";
 import { DOType, DOTypeDescription } from "./describe/DOType.js";
+import { LDevice, LDeviceDescription } from "./describe/LDevice.js";
 import { LNodeType, LNodeTypeDescription } from "./describe/LNodeType.js";
 import { LN, LNDescription } from "./describe/LN.js";
 import { LN0, LN0Description } from "./describe/LN0.js";
@@ -16,7 +17,8 @@ export type Description =
   | DOTypeDescription
   | LNodeTypeDescription
   | LNDescription
-  | LN0Description;
+  | LN0Description
+  | LDeviceDescription;
 const sclElementDescriptors: Partial<
   Record<string, (element: Element) => Description | undefined>
 > = {
@@ -28,6 +30,7 @@ const sclElementDescriptors: Partial<
   LNodeType,
   LN,
   LN0,
+  LDevice,
 };
 
 export function describe(element: Element): Description | undefined {

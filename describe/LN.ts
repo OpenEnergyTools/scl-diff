@@ -17,6 +17,37 @@ import {
 } from "./ReportControl.js";
 import { describeVal, compareBySGroup } from "./Val.js";
 
+export function sortedLNDescriptions(
+  parent: Element,
+): Record<string, LNDescription> | undefined {
+  const lns: Record<string, LNDescription> = {};
+  let existUndefinedLns = false;
+  Array.from(parent.children)
+    .filter((child) => child.tagName === "LN")
+    .forEach((ln) => {
+      const prefix = ln.getAttribute("prefix");
+      const lnClass = ln.getAttribute("lnClass");
+      const inst = ln.getAttribute("inst");
+      if (!lnClass || !inst) {
+        existUndefinedLns = true;
+        return;
+      }
+
+      const id = `${prefix ? prefix : ""}${lnClass}${inst}`;
+
+      const lnDescription = LN(ln);
+      if (!lnDescription) {
+        existUndefinedLns = true;
+        return;
+      }
+
+      lns[id] = lnDescription;
+    });
+  if (existUndefinedLns) return;
+
+  return sortRecord(lns) as Record<string, LNDescription>;
+}
+
 export interface LNDescription extends NamingDescription {
   reports: Record<string, ReportControlDescription>;
   logControls: Record<string, LogControlDescription>;

@@ -149,15 +149,9 @@ const baseEnumType = testScl.querySelector("#someID")!;
 const diffEnumType = testScl.querySelector("#someDiffID")!;
 const equalEnumType = testScl.querySelector("#someOtherID")!;
 
-const baseServer = testScl.querySelector(
-  `IED[name="IED1"] LDevice[inst="ldInst1"]`,
-)!;
-const equalServer = testScl.querySelector(
-  `IED[name="IED2"] LDevice[inst="ldInst2"]`,
-)!;
-const diffServer = testScl.querySelector(
-  `IED[name="IED2"] LDevice[inst="ldInst3"]`,
-)!;
+const baseAP = testScl.querySelector(`IED[name="IED1"]>AccessPoint`)!;
+const equalAP = testScl.querySelector(`IED[name="IED2"]>AccessPoint`)!;
+const diffAP = testScl.querySelector(`IED[name="IED3"]>AccessPoint`)!;
 
 describe("Describe SCL elements function", () => {
   it("returns undefined with missing describe function", () =>
@@ -176,13 +170,13 @@ describe("Describe SCL elements function", () => {
       JSON.stringify(describeSclElement(equalEnumType)),
     ));
 
-  it("returns same description with semantically equal LDevice's", () =>
-    expect(JSON.stringify(describeSclElement(baseServer))).to.equal(
-      JSON.stringify(describeSclElement(equalServer)),
+  it("returns same description with semantically equal AccessPoint's", () =>
+    expect(JSON.stringify(describeSclElement(baseAP))).to.equal(
+      JSON.stringify(describeSclElement(equalAP)),
     ));
 
-  it("returns different description with unequal LDevice elements", () =>
-    expect(JSON.stringify(describeSclElement(baseServer))).to.not.equal(
-      JSON.stringify(describeSclElement(diffServer)),
+  it("returns different description with unequal AccessPoint elements", () =>
+    expect(JSON.stringify(describeSclElement(baseAP))).to.not.equal(
+      JSON.stringify(describeSclElement(diffAP)),
     ));
 });

@@ -1,0 +1,15 @@
+import { AccessPointDescription } from "./describe/AccessPoint.js";
+import { IEDDescription } from "./describe/IED.js";
+import { PrivateDescription } from "./describe/Private.js";
+import { TextDescription } from "./describe/Text.js";
+import { EnumTypeDescription } from "./describe/EnumType.js";
+import { DATypeDescription } from "./describe/DAType.js";
+import { DOTypeDescription } from "./describe/DOType.js";
+import { LDeviceDescription } from "./describe/LDevice.js";
+import { LNodeTypeDescription } from "./describe/LNodeType.js";
+import { LNDescription } from "./describe/LN.js";
+import { LN0Description } from "./describe/LN0.js";
+import { ServerDescription } from "./describe/Server.js";
+import { ServicesDescription } from "./describe/Services.js";
+export type Description = PrivateDescription | TextDescription | EnumTypeDescription | DATypeDescription | DOTypeDescription | LNodeTypeDescription | LNDescription | LN0Description | LDeviceDescription | ServerDescription | ServicesDescription | AccessPointDescription | IEDDescription;
+export declare function describe(element: Element): Description | undefined;

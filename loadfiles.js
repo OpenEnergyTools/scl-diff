@@ -72,8 +72,8 @@ oursinput.addEventListener("change", async (event) => {
     addOptions(oursdoc, oursselect);        
 });
 
-oursselect.addEventListener('click',(event)=>{
-    const iedName = event.target.getAttribute('value');
+oursselect.addEventListener('input',(event)=>{
+    const iedName = event.target.value;
     const ied = oursdoc.querySelector(`IED[name="${iedName}"]`);
     if(!ied) return;
 
@@ -102,8 +102,8 @@ theirsinput.addEventListener("change", async (event) => {
     addOptions(theirsdoc, theirsselect);
 });
 
-theirsselect.addEventListener('click',(event)=>{
-    const iedName = event.target.getAttribute('value');
+theirsselect.addEventListener('input',(event)=>{
+    const iedName = event.target.value;
     const ied = theirsdoc.querySelector(`IED[name="${iedName}"]`);
     if(!ied) return;
 

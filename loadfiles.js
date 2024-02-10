@@ -1,6 +1,6 @@
 
 import {describe} from './describe.js'
-import {getDiff} from '../node_modules/json-difference/dist/index.mjs'
+import {getDiff} from './json-difference/dist/index.mjs'
 
 const oursinput = document.querySelector("#oursinput");
 const oursloadstatus = document.querySelector(".oursloadstatus");

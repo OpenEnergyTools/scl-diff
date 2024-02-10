@@ -1,5 +1,6 @@
 
 import {describe} from './describe.js'
+import {getDiff} from '../node_modules/json-difference/dist/index.mjs'
 
 const oursinput = document.querySelector("#oursinput");
 const oursloadstatus = document.querySelector(".oursloadstatus");
@@ -15,6 +16,9 @@ const theirsdescload = document.querySelector(".theirsdescload");
 
 const compare = document.querySelector('.compare')
 const resultcompare = document.querySelector('.resultcompare');
+
+const diffArea = document.querySelector('.diff');
+
 
 let oursdoc;
 let theirsdoc;
@@ -121,6 +125,11 @@ theirsdescload.addEventListener('click',() => {
 compare.addEventListener('click',()=>{
     const result = JSON.stringify(oursdesc) === JSON.stringify(theirsdesc);
     resultcompare.textContent = `${oursied} and ${theirsied} are structurally ${result ? 'EQUAL' : "DIFFERENT"}`
+
+    const diff = getDiff(oursdesc,theirsdesc,{ isLodashLike: true })
+    console.log(diff);
+
+    diffArea.value = JSON.stringify(diff,undefined,4)
 })
         
 

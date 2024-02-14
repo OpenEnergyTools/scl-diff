@@ -8,9 +8,10 @@ const testScl = new DOMParser().parseFromString(
       xmlns:sxy="http://www.iec.ch/61850/2003/SCLcoordinates"
       xmlns:ens="http://somevalidURI"
     >
-      <IED name="IED">
+      <IED name="IED1">
         <AccessPoint name="AP1">
           <Server>
+            <Authentication />
             <LDevice inst="ldInst1">
               <LN0 lnClass="LLN0" inst="" lnType="baseLLN0"/>
               <LN lnClass="XCBR" inst="1" lnType="baseXCBR"/>
@@ -22,6 +23,40 @@ const testScl = new DOMParser().parseFromString(
             <LDevice inst="ldInst3">
               <LN0 lnClass="LLN0" inst="" lnType="diffLLN0"/>
               <LN lnClass="XCBR" inst="1" lnType="diffXCBR"/>
+              </LDevice>
+          </Server>
+        </AccessPoint>
+      </IED>
+      <IED name="IED2">
+        <AccessPoint name="AP1">
+          <Server>
+            <Authentication />
+            <LDevice inst="ldInst1">
+              <LN0 lnClass="LLN0" inst="" lnType="baseLLN0"/>
+              <LN lnClass="XCBR" inst="1" lnType="baseXCBR"/>
+            </LDevice>
+            <LDevice inst="ldInst2">
+              <LN0 lnClass="LLN0" inst="" lnType="equalLLN0"/>
+              <LN lnClass="XCBR" inst="1" lnType="equalXCBR"/>
+              </LDevice>
+            <LDevice inst="ldInst3">
+              <LN0 lnClass="LLN0" inst="" lnType="diffLLN0"/>
+              <LN lnClass="XCBR" inst="1" lnType="diffXCBR"/>
+              </LDevice>
+          </Server>
+        </AccessPoint>
+      </IED>
+      <IED name="IED3">
+        <AccessPoint name="AP1">
+          <Server>
+            <Authentication />
+            <LDevice inst="ldInst1">
+              <LN0 lnClass="LLN0" inst="" lnType="baseLLN0"/>
+              <LN lnClass="XCBR" inst="1" lnType="baseXCBR"/>
+            </LDevice>
+            <LDevice inst="ldInst2">
+              <LN0 lnClass="LLN0" inst="" lnType="equalLLN0"/>
+              <LN lnClass="XCBR" inst="1" lnType="equalXCBR"/>
               </LDevice>
           </Server>
         </AccessPoint>
@@ -114,9 +149,15 @@ const baseEnumType = testScl.querySelector("#someID")!;
 const diffEnumType = testScl.querySelector("#someDiffID")!;
 const equalEnumType = testScl.querySelector("#someOtherID")!;
 
-const baseLDevice = testScl.querySelector(`LDevice[inst="ldInst1"]`)!;
-const equalLDevice = testScl.querySelector(`LDevice[inst="ldInst2"]`)!;
-const diffLDevice = testScl.querySelector(`LDevice[inst="ldInst3"]`)!;
+const baseServer = testScl.querySelector(
+  `IED[name="IED1"] LDevice[inst="ldInst1"]`,
+)!;
+const equalServer = testScl.querySelector(
+  `IED[name="IED2"] LDevice[inst="ldInst2"]`,
+)!;
+const diffServer = testScl.querySelector(
+  `IED[name="IED2"] LDevice[inst="ldInst3"]`,
+)!;
 
 describe("Describe SCL elements function", () => {
   it("returns undefined with missing describe function", () =>
@@ -136,12 +177,12 @@ describe("Describe SCL elements function", () => {
     ));
 
   it("returns same description with semantically equal LDevice's", () =>
-    expect(JSON.stringify(describeSclElement(baseLDevice))).to.equal(
-      JSON.stringify(describeSclElement(equalLDevice)),
+    expect(JSON.stringify(describeSclElement(baseServer))).to.equal(
+      JSON.stringify(describeSclElement(equalServer)),
     ));
 
   it("returns different description with unequal LDevice elements", () =>
-    expect(JSON.stringify(describeSclElement(baseLDevice))).to.not.equal(
-      JSON.stringify(describeSclElement(diffLDevice)),
+    expect(JSON.stringify(describeSclElement(baseServer))).to.not.equal(
+      JSON.stringify(describeSclElement(diffServer)),
     ));
 });

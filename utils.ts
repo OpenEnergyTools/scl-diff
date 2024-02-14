@@ -1,6 +1,7 @@
 import { DADescription } from "./describe/DADescription.js";
 import { DODescription } from "./describe/DODescription.js";
 import { GSEControlDescription } from "./describe/GSEControl.js";
+import { LDeviceDescription } from "./describe/LDevice.js";
 import { LNDescription } from "./describe/LN.js";
 import { LogControlDescription } from "./describe/LogControl.js";
 import { NamingDescription } from "./describe/Naming.js";
@@ -11,6 +12,7 @@ import { SampledValueControlDescription } from "./describe/SampledValueControl.j
 type SortedObjects =
   | DADescription
   | GSEControlDescription
+  | LDeviceDescription
   | LNDescription
   | LogControlDescription
   | NamingDescription

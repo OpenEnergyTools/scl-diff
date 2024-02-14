@@ -46,7 +46,7 @@ const scl = new DOMParser().parseFromString(
         <EnumVal ord="-23"></EnumVal>
       </EnumType>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const equalEnumType = scl.querySelector("#someEqual")!;
@@ -70,31 +70,31 @@ describe("Description for SCL schema element tBaseElement", () => {
 
   it("returns same description with semantically equal EnumType's", () =>
     expect(JSON.stringify(EnumType(baseEnumType))).to.equal(
-      JSON.stringify(EnumType(equalEnumType))
+      JSON.stringify(EnumType(equalEnumType)),
     ));
 
   it("returns different description with unequal EnumType desc attribute", () =>
     expect(JSON.stringify(EnumType(baseEnumType))).to.not.equal(
-      JSON.stringify(EnumType(diffEnumVal1))
+      JSON.stringify(EnumType(diffEnumVal1)),
     ));
 
   it("returns different description with unequal EnumVal desc attribute", () =>
     expect(JSON.stringify(EnumType(baseEnumType))).to.not.equal(
-      JSON.stringify(EnumType(diffEnumVal2))
+      JSON.stringify(EnumType(diffEnumVal2)),
     ));
 
   it("returns different description with unequal EnumVal ord attributes", () =>
     expect(JSON.stringify(EnumType(baseEnumType))).to.not.equal(
-      JSON.stringify(EnumType(diffEnumVal3))
+      JSON.stringify(EnumType(diffEnumVal3)),
     ));
 
   it("returns different description with unequal Private child element order", () =>
     expect(JSON.stringify(EnumType(baseEnumType))).to.not.equal(
-      JSON.stringify(EnumType(diffEnumVal4))
+      JSON.stringify(EnumType(diffEnumVal4)),
     ));
 
   it("ignore schema invalid ord definition", () =>
     expect(JSON.stringify(EnumType(baseEnumType))).to.equal(
-      JSON.stringify(EnumType(diffEnumVal5))
+      JSON.stringify(EnumType(diffEnumVal5)),
     ));
 });

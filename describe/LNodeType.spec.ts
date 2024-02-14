@@ -34,7 +34,7 @@ const scl = new DOMParser().parseFromString(
         </DOType>
     </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseLNodeType = scl.querySelector(`#baseLNodeType`)!;
@@ -47,7 +47,7 @@ const orphanLNode = new DOMParser()
     `<LNodeType id="orphanLNode" lnClass="PTOC" >
       <DO name="Pos" type="doType" />
     </LNodeType>`,
-    "application/xml"
+    "application/xml",
   )
   .querySelector("LNodeType")!;
 
@@ -72,12 +72,12 @@ describe("Description for SCL schema type LNodeType", () => {
 
   it("returns same description with semantically equal LNodeType's", () => {
     expect(JSON.stringify(LNodeType(baseLNodeType))).to.equal(
-      JSON.stringify(LNodeType(equalLNodeType))
+      JSON.stringify(LNodeType(equalLNodeType)),
     );
   });
 
   it("returns different description with unequal LNodeType elements", () =>
     expect(JSON.stringify(LNodeType(baseLNodeType))).to.not.equal(
-      JSON.stringify(LNodeType(diffLNodeType))
+      JSON.stringify(LNodeType(diffLNodeType)),
     ));
 });

@@ -1,5 +1,6 @@
 import { NamingDescription, describeNaming } from "./Naming.js";
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function isEnumTypeDescription(type: any): type is EnumTypeDescription {
   return "enumVals" in type;
 }
@@ -23,7 +24,7 @@ export function EnumType(element: Element): EnumTypeDescription {
 
     enumTypeDesc.enumVals[ord] = {
       desc: enumVal.getAttribute("desc") ?? "",
-      content: enumVal.textContent || "",
+      content: enumVal.textContent ?? "",
     };
   });
 

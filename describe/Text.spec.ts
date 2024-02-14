@@ -14,7 +14,7 @@ const textElement = new DOMParser()
         Some more detailed description than the desc field
       </Text>
     </SCL>`,
-    "application/xml"
+    "application/xml",
   )
   .querySelector("Text")!;
 

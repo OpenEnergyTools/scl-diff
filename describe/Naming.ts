@@ -1,4 +1,4 @@
-import { BaseElementDescription, describeBaseElement } from "./BaseElement";
+import { BaseElementDescription, describeBaseElement } from "./BaseElement.js";
 
 export interface NamingDescription extends BaseElementDescription {
   desc?: string;

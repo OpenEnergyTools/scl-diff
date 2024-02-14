@@ -9,7 +9,7 @@ const scl = new DOMParser().parseFromString(
       <EnumType id="someDifferent" />
       <EnumType id="someOtherEqual" desc="someDesc" />
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseElement = scl.querySelector("#someEqual")!;
@@ -22,11 +22,11 @@ describe("Description for SCL schema element tBaseElement", () => {
 
   it("returns same description with semantically equal Naming type SCL element", () =>
     expect(JSON.stringify(describeNaming(baseElement))).to.equal(
-      JSON.stringify(describeNaming(equalElement))
+      JSON.stringify(describeNaming(equalElement)),
     ));
 
   it("returns different description with unequal Naming type SCL element", () =>
     expect(JSON.stringify(describeNaming(diffElement))).to.not.equal(
-      JSON.stringify(describeNaming(equalElement))
+      JSON.stringify(describeNaming(equalElement)),
     ));
 });

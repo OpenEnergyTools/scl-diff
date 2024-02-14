@@ -8,7 +8,8 @@ import { LN, LNDescription } from "./describe/LN.js";
 
 export type Description =
   | PrivateDescription
-  | TextDescription
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+  | TextDescription // FIXME: duplication to PrivateDescription
   | EnumTypeDescription
   | DATypeDescription
   | DOTypeDescription

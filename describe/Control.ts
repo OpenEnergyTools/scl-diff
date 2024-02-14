@@ -6,7 +6,7 @@ export interface ControlDescription extends NamingDescription {
 }
 
 export function describeControl(
-  element: Element
+  element: Element,
 ): ControlDescription | undefined {
   const datSet = element.getAttribute("datSet");
   if (!datSet) return { ...describeNaming(element) };
@@ -15,7 +15,7 @@ export function describeControl(
     (child) =>
       child.tagName === "DataSet" &&
       child.getAttribute("name") &&
-      child.getAttribute("name") === datSet
+      child.getAttribute("name") === datSet,
   );
   if (!dataSet) return;
 

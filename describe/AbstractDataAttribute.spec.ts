@@ -48,7 +48,7 @@ const scl = new DOMParser().parseFromString(
         </EnumType>
     </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseBDA = scl.querySelector(`#baseDAType>BDA`)!;
@@ -57,14 +57,14 @@ const equalBDA = scl.querySelector(`#equalDAType>BDA`)!;
 const orphanBDA = new DOMParser()
   .parseFromString(
     `<BDA name="hstVal" desc="refArrayBDA" bType="FLOAT32" count="hstRangeC" />`,
-    "application/xml"
+    "application/xml",
   )
   .querySelector("BDA")!;
 
 const missingBType = scl.querySelector(`BDA[desc="missingBType"`)!;
 const refInvalidCount = scl.querySelector(`BDA[desc="invalidRefArrayBDA"`)!;
 const refInvalidSiblingCount = scl.querySelector(
-  `BDA[desc="invalidSiblingCount"`
+  `BDA[desc="invalidSiblingCount"`,
 )!;
 const refMissingCount = scl.querySelector(`BDA[desc="missingRefArrayBDA"`)!;
 const refValidCount = scl.querySelector(`BDA[desc="refArrayBDA"`)!;
@@ -78,7 +78,7 @@ describe("Description for SCL schema type tAbstractDataAttribute", () => {
   it("returns property sAddr with existing sAddr attribute", () => {
     expect(describeDAorSDAorDAI(baseBDA)).to.have.property(
       "sAddr",
-      "someSAddr"
+      "someSAddr",
     );
     expect(describeDAorSDAorDAI(diffBDA1)).to.not.have.property("sAddr");
   });
@@ -97,7 +97,7 @@ describe("Description for SCL schema type tAbstractDataAttribute", () => {
     expect(describeDAorSDAorDAI(diffBDA1)).to.have.property("bType", "FLOAT32");
     expect(describeDAorSDAorDAI(missingBType)).to.have.property(
       "bType",
-      "undefined"
+      "undefined",
     );
   });
 
@@ -115,7 +115,7 @@ describe("Description for SCL schema type tAbstractDataAttribute", () => {
 
     expect(describeDAorSDAorDAI(refInvalidSiblingCount)).to.have.property(
       "count",
-      0
+      0,
     );
   });
 
@@ -125,7 +125,7 @@ describe("Description for SCL schema type tAbstractDataAttribute", () => {
     expect(describeDAorSDAorDAI(baseBDA).type).to.satisfy(isDATypeDescription);
 
     expect(describeDAorSDAorDAI(diffBDA2).type).to.satisfy(
-      isEnumTypeDescription
+      isEnumTypeDescription,
     );
   });
 
@@ -138,11 +138,11 @@ describe("Description for SCL schema type tAbstractDataAttribute", () => {
 
   it("returns same description with semantically equal BDA's", () =>
     expect(JSON.stringify(describeDAorSDAorDAI(baseBDA))).to.equal(
-      JSON.stringify(describeDAorSDAorDAI(equalBDA))
+      JSON.stringify(describeDAorSDAorDAI(equalBDA)),
     ));
 
   it("returns different description with unequal BDA elements", () =>
     expect(JSON.stringify(describeDAorSDAorDAI(baseBDA))).to.not.equal(
-      JSON.stringify(describeDAorSDAorDAI(diffBDA2))
+      JSON.stringify(describeDAorSDAorDAI(diffBDA2)),
     ));
 });

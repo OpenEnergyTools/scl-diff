@@ -5,6 +5,7 @@ import {
 import { NamingDescription, describeNaming } from "./Naming.js";
 import { ProtNsDescription, describeProtNs } from "./ProtNs.js";
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function isDATypeDescription(type: any): type is DATypeDescription {
   return "bdas" in type && "protns" in type;
 }
@@ -35,7 +36,7 @@ export function DAType(element: Element): DATypeDescription {
         bdaOrProtNs.getAttribute("name") &&
         bdaOrProtNs.getAttribute("bType")
       )
-        daTypeDesc["bdas"][bdaOrProtNs.getAttribute("name")!] =
+        daTypeDesc.bdas[bdaOrProtNs.getAttribute("name")!] =
           describeDAorSDAorDAI(bdaOrProtNs);
       if (bdaOrProtNs.tagName === "ProtNs")
         daTypeDesc.protns.push(describeProtNs(bdaOrProtNs));

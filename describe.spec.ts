@@ -88,7 +88,7 @@ const testScl = new DOMParser().parseFromString(
       </EnumType>
       </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const sclElement = testScl.querySelector("SCL")!;
@@ -111,21 +111,21 @@ describe("Describe SCL elements function", () => {
 
   it("return equal description with semantically equal SCL element", () =>
     expect(JSON.stringify(describeSclElement(baseEnumType))).to.equal(
-      JSON.stringify(describeSclElement(equalEnumType))
+      JSON.stringify(describeSclElement(equalEnumType)),
     ));
 
   it("return different description with semantically unequal SCL element", () =>
     expect(JSON.stringify(describeSclElement(diffEnumType))).to.not.equal(
-      JSON.stringify(describeSclElement(equalEnumType))
+      JSON.stringify(describeSclElement(equalEnumType)),
     ));
 
   it("returns same description with semantically equal LN's", () =>
     expect(JSON.stringify(describeSclElement(baseLN))).to.equal(
-      JSON.stringify(describeSclElement(equalLN))
+      JSON.stringify(describeSclElement(equalLN)),
     ));
 
   it("returns different description with unequal LN elements", () =>
     expect(JSON.stringify(describeSclElement(baseLN))).to.not.equal(
-      JSON.stringify(describeSclElement(diffLN))
+      JSON.stringify(describeSclElement(diffLN)),
     ));
 });

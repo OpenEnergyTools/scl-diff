@@ -1,6 +1,13 @@
 import { sortRecord } from "../utils.js";
 import { AbstractDataAttributeDescription } from "./AbstractDataAttribute.js";
-import { LNodeType, LNodeTypeDescription } from "./LNodeType.js";
+import { DADescription } from "./DADescription.js";
+import { DATypeDescription } from "./DAType.js";
+import { DOTypeDescription, isDOTypeDescription } from "./DOType.js";
+import {
+  LNodeType,
+  LNodeTypeDescription,
+  isLNodeTypeDescription,
+} from "./LNodeType.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
 import {
   ReportControlDescription,
@@ -14,7 +21,7 @@ export interface LNDescription extends NamingDescription {
 }
 
 function reportControls(
-  element: Element
+  element: Element,
 ): Record<string, ReportControlDescription> {
   const unsortedReports: Record<string, ReportControlDescription> = {};
 
@@ -27,7 +34,38 @@ function reportControls(
         unsortedReports[name] = reportDescription;
     });
 
-  return sortRecord(unsortedReports);
+  return sortRecord(unsortedReports) as Record<
+    string,
+    ReportControlDescription
+  >;
+}
+
+function getNextDataType(
+  dataType: LNodeTypeDescription | DOTypeDescription | DATypeDescription,
+  path: string[],
+  index = 0,
+): DADescription | AbstractDataAttributeDescription | undefined {
+  if (isLNodeTypeDescription(dataType))
+    if (dataType.dos[path[index]]?.type)
+      return getNextDataType(dataType.dos[path[index]].type, path, ++index);
+    else return;
+  else if (isDOTypeDescription(dataType))
+    if (dataType.sdos[path[index]])
+      return getNextDataType(dataType.sdos[path[index]].type, path, ++index);
+    else if (dataType.das[path[index]]?.bType === "Struct")
+      return getNextDataType(
+        dataType.das[path[index]].type as DATypeDescription,
+        path,
+        ++index,
+      );
+    else return dataType.das[path[index]];
+  else if (dataType.bdas[path[index]].bType === "Struct")
+    return getNextDataType(
+      dataType.bdas[path[index]].type as DATypeDescription,
+      path,
+      ++index,
+    );
+  else return dataType.bdas[path[index]];
 }
 
 /** Returns leaf data attribute (BDA or DA) from
@@ -37,39 +75,14 @@ function reportControls(
  * */
 function getLeafDataAttribute(
   path: string[],
-  lNodeType: LNodeTypeDescription
-): Object | undefined {
-  let index = 0;
-  let dataType: any = lNodeType;
-
-  while (path.length > index) {
-    if (dataType.dos)
-      // LNodeType->DO
-      dataType = dataType.dos[path[index]].type;
-    else if (dataType.sdos || dataType.das) {
-      // DOType
-      if (dataType.sdos[path[index]])
-        //SDO
-        dataType = dataType.sdos[path[index]].type;
-      else if (dataType.das[path[index]]) {
-        //DA
-        const da = dataType.das[path[index]];
-        if (da.bType === "Struct") dataType = da.type;
-        else return da;
-      }
-    } else {
-      // DAType->BDA
-      const bda = dataType.bdas[path[index]];
-      if (bda.bType === "Struct") dataType = bda.type;
-      else return bda;
-    }
-    index++;
-  }
+  lNodeType: LNodeTypeDescription,
+): AbstractDataAttributeDescription | DADescription | undefined {
+  return getNextDataType(lNodeType, path, 0);
 }
 
 function updateValues(
   lNodeType: LNodeTypeDescription,
-  instanceValues: Record<string, Element[]>
+  instanceValues: Record<string, Element[]>,
 ): LNodeTypeDescription {
   Object.entries(instanceValues).forEach(([key, value]) => {
     const leafDataAttribute = getLeafDataAttribute(key.split("."), lNodeType);
@@ -112,7 +125,7 @@ function instanceValues(ln: Element): Record<string, Element[]> {
 
 export function LN(element: Element): LNDescription | undefined {
   const lNodeType = element.ownerDocument.querySelector(
-    `DataTypeTemplates > LNodeType[id="${element.getAttribute("lnType")}"]`
+    `DataTypeTemplates > LNodeType[id="${element.getAttribute("lnType")}"]`,
   );
   if (!lNodeType) return;
 

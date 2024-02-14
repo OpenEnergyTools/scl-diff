@@ -3,7 +3,7 @@ import {
   describeControlWithTriggerOpt,
 } from "./ControlWithTriggerOpt.js";
 
-type Client = {
+interface Client {
   /** ClientLN attribute iedName */
   iedName: string;
   /** ClientLN attribute apRef (optional for reverse compatibility)*/
@@ -16,9 +16,9 @@ type Client = {
   lnClass: string;
   /** ClientLN attribute lnInst defaulting to "" */
   lnInst: string;
-};
+}
 
-type OptFields = {
+interface OptFields {
   /** OptFields attribute seqNum defaulting to false*/
   seqNum: boolean;
   /** OptFields attribute timeStamp defaulting to false*/
@@ -35,7 +35,7 @@ type OptFields = {
   configRef: boolean;
   /** OptFields attribute bufOvfl defaulting to false*/
   bufOvfl: boolean;
-};
+}
 
 export interface ReportControlDescription
   extends ControlWithTriggerOptDescription {
@@ -59,7 +59,7 @@ export interface ReportControlDescription
 
 function clients(element: Element): { maxClients: number; clients: Client[] } {
   const rptEnabled = Array.from(element.children).find(
-    (child) => child.tagName === "RptEnabled"
+    (child) => child.tagName === "RptEnabled",
   );
   if (!rptEnabled) return { maxClients: 0, clients: [] };
 
@@ -94,7 +94,7 @@ function clients(element: Element): { maxClients: number; clients: Client[] } {
 
 function optFields(element: Element): OptFields {
   const optFields = Array.from(element.children).find(
-    (child) => child.tagName === "OptFields"
+    (child) => child.tagName === "OptFields",
   );
 
   if (!optFields)
@@ -142,7 +142,7 @@ function optFields(element: Element): OptFields {
 }
 
 export function describeReportControl(
-  element: Element
+  element: Element,
 ): ReportControlDescription | undefined {
   const controlWithTriggerOptDesc = describeControlWithTriggerOpt(element);
   if (!controlWithTriggerOptDesc) return;

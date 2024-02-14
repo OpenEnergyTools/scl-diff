@@ -31,20 +31,20 @@ const scl = new DOMParser().parseFromString(
             </DAType>
         </DataTypeTemplates>
       </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const base1 = scl.querySelector(
-  'DAType[id="someDAType"] > BDA[name="someBDA"] > Val'
+  'DAType[id="someDAType"] > BDA[name="someBDA"] > Val',
 )!;
 const base2 = scl.querySelector(
-  'DAType[id="someDAType"] > BDA[name="someOtherBDA"] > Val'
+  'DAType[id="someDAType"] > BDA[name="someOtherBDA"] > Val',
 )!;
 const equal1 = scl.querySelector(
-  'DAType[id="someOtherDAType"] > BDA[name="someBDA"] > Val'
+  'DAType[id="someOtherDAType"] > BDA[name="someBDA"] > Val',
 )!;
 const equal2 = scl.querySelector(
-  'DAType[id="someOtherDAType"] > BDA[name="someOtherBDA"] > Val'
+  'DAType[id="someOtherDAType"] > BDA[name="someOtherBDA"] > Val',
 )!;
 
 const invalidsGroup = scl.querySelector('Val[sGroup="someInvalidsGroup"]')!;
@@ -52,19 +52,19 @@ const invalidsGroup = scl.querySelector('Val[sGroup="someInvalidsGroup"]')!;
 describe("Describes the SCL element Val", () => {
   it("returns equal description with semantically equal Val element", () => {
     expect(JSON.stringify(describeVal(base1))).to.equal(
-      JSON.stringify(describeVal(equal1))
+      JSON.stringify(describeVal(equal1)),
     );
     expect(JSON.stringify(describeVal(base2))).to.equal(
-      JSON.stringify(describeVal(equal2))
+      JSON.stringify(describeVal(equal2)),
     );
   });
 
   it("returns different description with semantically different Val element", () => {
     expect(JSON.stringify(describeVal(base1))).to.not.equal(
-      JSON.stringify(describeVal(equal2))
+      JSON.stringify(describeVal(equal2)),
     );
     expect(JSON.stringify(describeVal(base2))).to.not.equal(
-      JSON.stringify(describeVal(equal1))
+      JSON.stringify(describeVal(equal1)),
     );
   });
 

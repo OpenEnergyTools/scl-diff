@@ -29,17 +29,17 @@ const scl = new DOMParser().parseFromString(
         </EnumType>
     </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseDA = scl.querySelector(`DA[desc="someEqual"`)!;
 const diffDA1 = scl.querySelector(`DA[desc="someEnumDA"`)!;
 const diffDA2 = scl.querySelector(`DA[desc="someDiff1"`)!;
 const diffDA4 = scl.querySelector(
-  `DOType[id="someDiff"] > DA[desc="someEnumDA"]`
+  `DOType[id="someDiff"] > DA[desc="someEnumDA"]`,
 )!;
 const equalDA = scl.querySelector(
-  `DOType[id="someDiff"] > DA[desc="someEqual"]`
+  `DOType[id="someDiff"] > DA[desc="someEqual"]`,
 )!;
 
 describe("Description for SCL schema type DADescription", () => {
@@ -72,11 +72,11 @@ describe("Description for SCL schema type DADescription", () => {
 
   it("returns same description with semantically equal BDA's", () =>
     expect(JSON.stringify(describeDA(baseDA))).to.equal(
-      JSON.stringify(describeDA(equalDA))
+      JSON.stringify(describeDA(equalDA)),
     ));
 
   it("returns different description with unequal BDA elements", () =>
     expect(JSON.stringify(describeDA(baseDA))).to.not.equal(
-      JSON.stringify(describeDA(diffDA4))
+      JSON.stringify(describeDA(diffDA4)),
     ));
 });

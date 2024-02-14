@@ -59,7 +59,7 @@ const scl = new DOMParser().parseFromString(
         </AccessPoint>
       </IED>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseDataSet = scl.querySelector(`ReportControl[name="baseReport"]`)!;
@@ -76,11 +76,11 @@ describe("Description for SCL schema type ReportControl", () => {
 
   it("returns same description with semantically equal Control's", () =>
     expect(JSON.stringify(describeReportControl(baseDataSet))).to.equal(
-      JSON.stringify(describeReportControl(equalDataSet))
+      JSON.stringify(describeReportControl(equalDataSet)),
     ));
 
   it("returns different description with unequal Control elements", () =>
     expect(JSON.stringify(describeReportControl(baseDataSet))).to.not.equal(
-      JSON.stringify(describeReportControl(diffReport))
+      JSON.stringify(describeReportControl(diffReport)),
     ));
 });

@@ -30,7 +30,7 @@ const scl = new DOMParser().parseFromString(
         </EnumType>
     </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseDAType = scl.querySelector("#someEqual")!;
@@ -45,7 +45,7 @@ describe("Description for SCL schema element DAType", () => {
 
   it("returns property bdas recording BDA child elements", () =>
     expect(DAType(baseDAType).bdas["mag"]).to.satisfy(
-      isAbstractDataAttributeDescription
+      isAbstractDataAttributeDescription,
     ));
 
   it("returns property protns collecting ProtNs child elements", () => {
@@ -55,11 +55,11 @@ describe("Description for SCL schema element DAType", () => {
 
   it("returns same description with semantically equal DAType's", () =>
     expect(JSON.stringify(DAType(baseDAType))).to.equal(
-      JSON.stringify(DAType(equalDAType))
+      JSON.stringify(DAType(equalDAType)),
     ));
 
   it("returns different description with unequal DAType elements", () =>
     expect(JSON.stringify(DAType(baseDAType))).to.not.equal(
-      JSON.stringify(DAType(diffDAType1))
+      JSON.stringify(DAType(diffDAType1)),
     ));
 });

@@ -14,7 +14,7 @@ const privateElement = new DOMParser()
         <IED name="somePrivateIED"/>
       </Private>
     </SCL>`,
-    "application/xml"
+    "application/xml",
   )
   .querySelector("Private")!;
 

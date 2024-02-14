@@ -4,6 +4,7 @@ import { DADescription, describeDA } from "./DADescription.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
 import { SDODescription, describeSDO } from "./SDODescription.js";
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function isDOTypeDescription(type: any): type is DOTypeDescription {
   return "cdc" in type;
 }
@@ -102,22 +103,28 @@ export function DOType(element: Element): DOTypeDescription | undefined {
     .filter((child) => child.tagName === "DA" || child.tagName === "SDO")
     .forEach((daOrSdo) => {
       const [name, bType, fc, type] = ["name", "bType", "fc", "type"].map(
-        (attr) => daOrSdo.getAttribute(attr)
+        (attr) => daOrSdo.getAttribute(attr),
       );
 
       if (daOrSdo.tagName === "DA" && name && fc && bType) {
         const daDescription = describeDA(daOrSdo);
-        if (daDescription) unsortedDAs[name!] = daDescription;
+        if (daDescription) unsortedDAs[name] = daDescription;
       }
 
       if (daOrSdo.tagName === "SDO" && name && type) {
         const sdoDescription = describeSDO(daOrSdo);
-        if (sdoDescription) unsortedSDOs[name!] = sdoDescription;
+        if (sdoDescription) unsortedSDOs[name] = sdoDescription;
       }
     });
 
-  doTypeDescription.das = sortRecord(unsortedDAs);
-  doTypeDescription.sdos = sortRecord(unsortedSDOs);
+  doTypeDescription.das = sortRecord(unsortedDAs) as Record<
+    string,
+    DADescription
+  >;
+  doTypeDescription.sdos = sortRecord(unsortedSDOs) as Record<
+    string,
+    SDODescription
+  >;
 
   return doTypeDescription;
 }

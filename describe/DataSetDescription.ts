@@ -1,6 +1,6 @@
 import { describeNaming, NamingDescription } from "./Naming.js";
 
-type FCDA = {
+interface FCDA {
   iedName: string;
   ldInst: string;
   prefix: string;
@@ -9,14 +9,14 @@ type FCDA = {
   doName: string;
   daName?: string;
   fc: string;
-};
+}
 
 export interface DataSetDescription extends NamingDescription {
   data: FCDA[];
 }
 
 export function describeDataSet(
-  element: Element
+  element: Element,
 ): DataSetDescription | undefined {
   const maybeData = Array.from(element.children)
     .filter((child) => child.tagName === "FCDA")

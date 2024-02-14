@@ -13,7 +13,7 @@ export interface BaseElementDescription {
 }
 
 function sortENsAttributes(
-  eNsAttributes: ExtensionNSAttributes
+  eNsAttributes: ExtensionNSAttributes,
 ): ExtensionNSAttributes {
   return Object.keys(eNsAttributes)
     .sort()

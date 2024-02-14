@@ -3,7 +3,8 @@ import { DODescription, describeDO } from "./DODescription.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
 
 export function isLNodeTypeDescription(
-  type: any
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  type: any,
 ): type is LNodeTypeDescription {
   return "lnClass" in type && "dos" in type;
 }
@@ -34,16 +35,19 @@ export function LNodeType(element: Element): LNodeTypeDescription | undefined {
     .filter((child) => child.tagName === "DO")
     .forEach((dOs) => {
       const [name, type] = ["name", "type"].map((attr) =>
-        dOs.getAttribute(attr)
+        dOs.getAttribute(attr),
       );
 
       if (dOs.tagName === "DO" && name && type) {
         const doDescription = describeDO(dOs);
-        if (doDescription) unsortedDOs[name!] = doDescription;
+        if (doDescription) unsortedDOs[name] = doDescription;
       }
     });
 
-  lNodeTypeDescription.dos = sortRecord(unsortedDOs);
+  lNodeTypeDescription.dos = sortRecord(unsortedDOs) as Record<
+    string,
+    DODescription
+  >;
 
   return lNodeTypeDescription;
 }

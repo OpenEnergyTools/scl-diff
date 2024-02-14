@@ -37,7 +37,7 @@ const scl = new DOMParser().parseFromString(
         </DOType>
     </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseDOType = scl.querySelector(`#someBase`)!;
@@ -69,12 +69,12 @@ describe("Description for SCL schema type DOTypeDescription", () => {
 
   it("returns same description with semantically equal DOType's", () => {
     expect(JSON.stringify(DOType(baseDOType))).to.equal(
-      JSON.stringify(DOType(equalDOType))
+      JSON.stringify(DOType(equalDOType)),
     );
   });
 
   it("returns different description with unequal DOType elements", () =>
     expect(JSON.stringify(DOType(baseDOType))).to.not.equal(
-      JSON.stringify(DOType(diffDOType))
+      JSON.stringify(DOType(diffDOType)),
     ));
 });

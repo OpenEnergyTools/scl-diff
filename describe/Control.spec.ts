@@ -42,7 +42,7 @@ const scl = new DOMParser().parseFromString(
         </AccessPoint>
       </IED>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseDataSet = scl.querySelector(`*[datSet="baseDataSet"]`)!;
@@ -54,7 +54,7 @@ const invalidDataSet = scl.querySelector('*[datSet="invalidDataSet"]')!;
 const parentLessControl = new DOMParser()
   .parseFromString(
     `<ReportControl name="reportControl" datSet="parentLessDataSet" >`,
-    "application/xml"
+    "application/xml",
   )
   .querySelector("ReportControl")!;
 
@@ -70,11 +70,11 @@ describe("Description for SCL schema type tControl", () => {
 
   it("returns same description with semantically equal Control's", () =>
     expect(JSON.stringify(describeControl(baseDataSet))).to.equal(
-      JSON.stringify(describeControl(equalDataSet))
+      JSON.stringify(describeControl(equalDataSet)),
     ));
 
   it("returns different description with unequal Control elements", () =>
     expect(JSON.stringify(describeControl(baseDataSet))).to.not.equal(
-      JSON.stringify(describeControl(diffDataSet))
+      JSON.stringify(describeControl(diffDataSet)),
     ));
 });

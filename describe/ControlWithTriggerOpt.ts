@@ -1,6 +1,6 @@
 import { ControlDescription, describeControl } from "./Control.js";
 
-type TrgOps = {
+interface TrgOps {
   /** TrgOpts attribute dchg defaulting to false*/
   dchg: boolean;
   /** TrgOpts attribute qchg defaulting to false*/
@@ -11,7 +11,7 @@ type TrgOps = {
   period: boolean;
   /** TrgOpts attribute gi defaulting to false*/
   gi: boolean;
-};
+}
 
 export interface ControlWithTriggerOptDescription extends ControlDescription {
   trgOps: TrgOps;
@@ -21,7 +21,7 @@ export interface ControlWithTriggerOptDescription extends ControlDescription {
 
 function trgOps(element: Element): TrgOps {
   const trgOps = Array.from(element.children).find(
-    (child) => child.tagName === "TrgOps"
+    (child) => child.tagName === "TrgOps",
   );
   if (!trgOps)
     return { dchg: false, qchg: false, dupd: false, period: false, gi: false };
@@ -38,7 +38,7 @@ function trgOps(element: Element): TrgOps {
 }
 
 export function describeControlWithTriggerOpt(
-  element: Element
+  element: Element,
 ): ControlWithTriggerOptDescription | undefined {
   const controlDescription = describeControl(element);
   if (!controlDescription) return;

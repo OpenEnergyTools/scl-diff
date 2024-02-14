@@ -30,7 +30,7 @@ const scl = new DOMParser().parseFromString(
         </DOType>
     </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseDO = scl.querySelector(`#baseLNodeType > DO[name="Pos"]`)!;
@@ -38,10 +38,10 @@ const diffDO = scl.querySelector(`#diffLNodeType > DO[name="Pos"]`)!;
 const equalDO = scl.querySelector(`#equalLNodeType > DO[name="Pos"]`)!;
 
 const invalidReference = scl.querySelector(
-  `#invalidLNodeType > DO[desc="invalidReference"]`
+  `#invalidLNodeType > DO[desc="invalidReference"]`,
 )!;
 const invalidDOType = scl.querySelector(
-  `#invalidLNodeType > DO[desc="invalidDOType"]`
+  `#invalidLNodeType > DO[desc="invalidDOType"]`,
 )!;
 
 describe("Description for SCL schema type DO", () => {
@@ -65,12 +65,12 @@ describe("Description for SCL schema type DO", () => {
 
   it("returns same description with semantically equal DO's", () =>
     expect(JSON.stringify(describeDO(baseDO))).to.equal(
-      JSON.stringify(describeDO(equalDO))
+      JSON.stringify(describeDO(equalDO)),
     ));
 
   it("returns different description with unequal DO elements", () => {
     expect(JSON.stringify(describeDO(baseDO))).to.not.equal(
-      JSON.stringify(describeDO(diffDO))
+      JSON.stringify(describeDO(diffDO)),
     );
   });
 });

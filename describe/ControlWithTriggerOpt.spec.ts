@@ -44,7 +44,7 @@ const scl = new DOMParser().parseFromString(
         </AccessPoint>
       </IED>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseDataSet = scl.querySelector(`*[datSet="baseDataSet"]`)!;
@@ -62,11 +62,11 @@ describe("Description for SCL schema type tControlWithTriggerOpt", () => {
 
   it("returns same description with semantically equal Control's", () =>
     expect(JSON.stringify(describeControlWithTriggerOpt(baseDataSet))).to.equal(
-      JSON.stringify(describeControlWithTriggerOpt(equalDataSet))
+      JSON.stringify(describeControlWithTriggerOpt(equalDataSet)),
     ));
 
   it("returns different description with unequal Control elements", () =>
     expect(
-      JSON.stringify(describeControlWithTriggerOpt(baseDataSet))
+      JSON.stringify(describeControlWithTriggerOpt(baseDataSet)),
     ).to.not.equal(JSON.stringify(describeControlWithTriggerOpt(diffDataSet))));
 });

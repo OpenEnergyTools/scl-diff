@@ -18,15 +18,15 @@ const scl = new DOMParser().parseFromString(
         </DAType>
     </DataTypeTemplates>
   </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseProtNs = scl.querySelector('DAType[id="someDAType"] > ProtNs')!;
 const diffProtNs1 = scl.querySelector(
-  'DAType[id="someDifferentDAType1"] > ProtNs'
+  'DAType[id="someDifferentDAType1"] > ProtNs',
 )!;
 const diffProtNs2 = scl.querySelector(
-  'DAType[id="someDifferentDAType2"] > ProtNs'
+  'DAType[id="someDifferentDAType2"] > ProtNs',
 )!;
 const equalProtNs = scl.querySelector('DAType[id="someOtherDAType"] > ProtNs')!;
 
@@ -38,15 +38,15 @@ describe("Describes the SCL element ProtNs", () => {
 
   it("returns equal description with semantically equal ProNs element", () =>
     expect(JSON.stringify(describeProtNs(baseProtNs))).to.equal(
-      JSON.stringify(describeProtNs(equalProtNs))
+      JSON.stringify(describeProtNs(equalProtNs)),
     ));
 
   it("returns different description with semantically different ProtNs element", () => {
     expect(JSON.stringify(describeProtNs(baseProtNs))).to.not.equal(
-      JSON.stringify(describeProtNs(diffProtNs1))
+      JSON.stringify(describeProtNs(diffProtNs1)),
     );
     expect(JSON.stringify(describeProtNs(baseProtNs))).to.not.equal(
-      JSON.stringify(describeProtNs(diffProtNs2))
+      JSON.stringify(describeProtNs(diffProtNs2)),
     );
   });
 });

@@ -4,7 +4,8 @@ import { NamingDescription, describeNaming } from "./Naming.js";
 import { ValDescription, describeVal, compareBySGroup } from "./Val.js";
 
 export function isAbstractDataAttributeDescription(
-  type: any
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  type: any,
 ): type is AbstractDataAttributeDescription {
   return (
     "bType" in type &&
@@ -37,7 +38,7 @@ function siblingCount(element: Element, name: string): number {
   if (!parent) return NaN;
 
   const sibling = Array.from(parent.children).find(
-    (child) => child.getAttribute("name") === name
+    (child) => child.getAttribute("name") === name,
   );
   if (!sibling) return NaN;
 
@@ -50,11 +51,11 @@ function siblingCount(element: Element, name: string): number {
 }
 
 export function describeDAorSDAorDAI(
-  element: Element
+  element: Element,
 ): AbstractDataAttributeDescription {
   const abstractDataAttributeDesc: AbstractDataAttributeDescription = {
     ...describeNaming(element),
-    bType: element.getAttribute("bType") || "undefined",
+    bType: element.getAttribute("bType") ?? "undefined",
     valKind: "Set",
     valImport: false,
     count: 0,
@@ -94,10 +95,8 @@ export function describeDAorSDAorDAI(
     .sort(compareBySGroup);
 
   const referencedType = Array.from(
-    element.closest("DataTypeTemplates")?.children ?? []
-  ).find(
-    (sibling) => sibling.getAttribute("id") === element.getAttribute("type")
-  );
+    element.closest("DataTypeTemplates")?.children ?? [],
+  ).find((sibling) => sibling.getAttribute("id") === type);
   if (
     abstractDataAttributeDesc.bType === "Enum" &&
     referencedType &&

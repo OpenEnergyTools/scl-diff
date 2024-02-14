@@ -6,12 +6,12 @@ export function compareBySGroup(a: ValDescription, b: ValDescription): number {
   return 1;
 }
 
-export type ValDescription = {
+export interface ValDescription {
   /** Optional Val attribute sGroup */
   sGroup?: number;
   /** Val elements text content defaulting to "" */
   val: string;
-};
+}
 
 export function describeVal(element: Element): ValDescription {
   const valDesc: ValDescription = { val: "" };
@@ -21,7 +21,7 @@ export function describeVal(element: Element): ValDescription {
   )
     valDesc.sGroup = parseInt(element.getAttribute("sGroup")!, 10);
 
-  valDesc.val = element.textContent || "";
+  valDesc.val = element.textContent ?? "";
 
   return valDesc;
 }

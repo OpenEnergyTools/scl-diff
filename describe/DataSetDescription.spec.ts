@@ -49,7 +49,7 @@ const scl = new DOMParser().parseFromString(
         </AccessPoint>
       </IED>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseDataSet = scl.querySelector(`*[name="baseDataSet"]`)!;
@@ -73,11 +73,11 @@ describe("Description for SCL schema type DataSet", () => {
 
   it("returns same description with semantically equal DataSet's", () =>
     expect(JSON.stringify(describeDataSet(baseDataSet))).to.equal(
-      JSON.stringify(describeDataSet(equalDataSet))
+      JSON.stringify(describeDataSet(equalDataSet)),
     ));
 
   it("returns different description with unequal DataSet elements", () =>
     expect(JSON.stringify(describeDataSet(baseDataSet))).to.not.equal(
-      JSON.stringify(describeDataSet(diffDataSet))
+      JSON.stringify(describeDataSet(diffDataSet)),
     ));
 });

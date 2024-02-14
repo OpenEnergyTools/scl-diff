@@ -24,7 +24,7 @@ const scl = new DOMParser().parseFromString(
         </DOType>
     </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseSDO = scl.querySelector(`SDO[name="phsA"`)!;
@@ -36,7 +36,7 @@ const invalidType = scl.querySelector(`SDO[name="phsD"`)!;
 const orphanSDO = new DOMParser()
   .parseFromString(
     `<SDO name="hstVal" type="someReference" />`,
-    "application/xml"
+    "application/xml",
   )
   .querySelector("SDO")!;
 
@@ -50,11 +50,11 @@ describe("Description for SCL schema type SDODescription", () => {
 
   it("returns same description with semantically equal SDO's", () =>
     expect(JSON.stringify(describeSDO(baseSDO))).to.equal(
-      JSON.stringify(describeSDO(equalSDO))
+      JSON.stringify(describeSDO(equalSDO)),
     ));
 
   it("returns different description with unequal SDO elements", () =>
     expect(JSON.stringify(describeSDO(baseSDO))).to.not.equal(
-      JSON.stringify(describeSDO(diffSDO))
+      JSON.stringify(describeSDO(diffSDO)),
     ));
 });

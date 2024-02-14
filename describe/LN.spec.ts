@@ -75,6 +75,13 @@ const scl = new DOMParser().parseFromString(
                           <Val sGroup="2">20.20</Val>
                         </SDI>
                     </DOI>
+                    <DOI name="B" >
+                        <SDI name="phsA" >
+                          <Val sGroup="1">10.10</Val>
+                          <Val sGroup="3">30.30</Val>
+                          <Val sGroup="2">20.20</Val>
+                        </SDI>
+                    </DOI>
                 </LN>
               </LDevice>
               <LDevice inst="lDevice4" >
@@ -189,38 +196,38 @@ const scl = new DOMParser().parseFromString(
         </EnumType>
       </DataTypeTemplates>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const missingLnType = scl.querySelector('*[desc="missingLnType"]')!;
 const invalidLnType = scl.querySelector('*[desc="invalidLnType"]')!;
 const invalidLnTypeDescription = scl.querySelector(
-  '*[desc="invalidLnTypeDescription"]'
+  '*[desc="invalidLnTypeDescription"]',
 )!;
 
 const baseLLN0 = scl.querySelector(
-  `LDevice[inst="lDevice1"] > *[lnClass="LLN0"][inst=""]`
+  `LDevice[inst="lDevice1"] > *[lnClass="LLN0"][inst=""]`,
 )!;
 const equalLLN0 = scl.querySelector(
-  'LDevice[inst="lDevice2"] > *[lnClass="LLN0"][inst=""]'
+  'LDevice[inst="lDevice2"] > *[lnClass="LLN0"][inst=""]',
 )!;
 const diffLLN0 = scl.querySelector(
-  'LDevice[inst="lDevice3"] > *[lnClass="LLN0"][inst=""]'
+  'LDevice[inst="lDevice3"] > *[lnClass="LLN0"][inst=""]',
 )!;
 const diffEnumType = scl.querySelector(
-  'LDevice[inst="lDevice4"] > *[lnClass="LLN0"][inst=""]'
+  'LDevice[inst="lDevice4"] > *[lnClass="LLN0"][inst=""]',
 )!;
 const baseMMXU = scl.querySelector(
-  `LDevice[inst="lDevice1"] > *[lnClass="MMXU"][inst="1"]`
+  `LDevice[inst="lDevice1"] > *[lnClass="MMXU"][inst="1"]`,
 )!;
 const equalMMXU = scl.querySelector(
-  `LDevice[inst="lDevice2"] > *[lnClass="MMXU"][inst="1"]`
+  `LDevice[inst="lDevice2"] > *[lnClass="MMXU"][inst="1"]`,
 )!;
 const diffMMXU = scl.querySelector(
-  `LDevice[inst="lDevice3"] > *[lnClass="MMXU"][inst="1"]`
+  `LDevice[inst="lDevice3"] > *[lnClass="MMXU"][inst="1"]`,
 )!;
 const diffSDO = scl.querySelector(
-  `LDevice[inst="lDevice4"] > *[lnClass="MMXU"][inst="1"]`
+  `LDevice[inst="lDevice4"] > *[lnClass="MMXU"][inst="1"]`,
 )!;
 
 describe("Description for SCL schema type LN", () => {
@@ -238,25 +245,25 @@ describe("Description for SCL schema type LN", () => {
 
   it("returns same description with semantically equal LN's", () => {
     expect(JSON.stringify(LN(baseLLN0))).to.equal(
-      JSON.stringify(LN(equalLLN0))
+      JSON.stringify(LN(equalLLN0)),
     );
     expect(JSON.stringify(LN(baseMMXU))).to.equal(
-      JSON.stringify(LN(equalMMXU))
+      JSON.stringify(LN(equalMMXU)),
     );
   });
 
   it("returns different description with unequal LN elements", () => {
     expect(JSON.stringify(LN(baseLLN0))).to.not.equal(
-      JSON.stringify(LN(diffLLN0))
+      JSON.stringify(LN(diffLLN0)),
     );
     expect(JSON.stringify(LN(baseLLN0))).to.not.equal(
-      JSON.stringify(LN(diffEnumType))
+      JSON.stringify(LN(diffEnumType)),
     );
     expect(JSON.stringify(LN(baseMMXU))).to.not.equal(
-      JSON.stringify(LN(diffMMXU))
+      JSON.stringify(LN(diffMMXU)),
     );
     expect(JSON.stringify(LN(baseMMXU))).to.not.equal(
-      JSON.stringify(LN(diffSDO))
+      JSON.stringify(LN(diffSDO)),
     );
   });
 });

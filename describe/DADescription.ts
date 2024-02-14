@@ -31,7 +31,7 @@ export function describeDA(element: Element): DADescription {
   };
 
   const [dchg, qchg, dupd, fc] = ["dchg", "qchg", "dupd", "fc"].map((attr) =>
-    element.getAttribute(attr)
+    element.getAttribute(attr),
   );
 
   if (dchg && dchg === "true") daDescription.dchg = true;

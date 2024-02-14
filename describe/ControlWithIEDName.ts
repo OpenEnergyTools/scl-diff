@@ -9,7 +9,7 @@ function compareIEDNameDescription(a: IEDName, b: IEDName): number {
   return 0;
 }
 
-type IEDName = {
+interface IEDName {
   /** IEDName attribute apRef*/
   apRef?: string;
   /** IEDName attribute ldInst*/
@@ -22,7 +22,7 @@ type IEDName = {
   lnInst?: string;
   /** IEDName child text content */
   val?: string;
-};
+}
 
 function describeIEDName(element: Element): IEDName {
   const iedName: IEDName = {};
@@ -55,7 +55,7 @@ export interface ControlWithIEDNameDescription extends ControlDescription {
 }
 
 export function describeControlWithIEDName(
-  element: Element
+  element: Element,
 ): ControlWithIEDNameDescription | undefined {
   const controlDescription = describeControl(element);
   if (!controlDescription) return;
@@ -69,7 +69,7 @@ export function describeControlWithIEDName(
     ...Array.from(element.children)
       .filter((child) => child.tagName === "IEDName")
       .map((iedName) => describeIEDName(iedName))
-      .sort(compareIEDNameDescription)
+      .sort(compareIEDNameDescription),
   );
 
   const confRev = element.getAttribute("confRev");

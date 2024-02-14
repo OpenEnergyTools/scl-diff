@@ -65,7 +65,7 @@ const scl = new DOMParser().parseFromString(
         </AccessPoint>
       </IED>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseSampledValueControl = scl.querySelector(`*[datSet="baseDataSet"]`)!;
@@ -74,13 +74,13 @@ const diffSampledValueControl = scl.querySelector('*[datSet="diffDataSet"]')!;
 const invalidDataSet = scl.querySelector('*[datSet="invalidDataSet"]')!;
 const invalidReference = scl.querySelector('*[datSet="invalidReference"]')!;
 const missingSmpRate = scl.querySelector(
-  'SampledValueControl[name="missingSmpRate"]'
+  'SampledValueControl[name="missingSmpRate"]',
 )!;
 const missingNofASDU = scl.querySelector(
-  'SampledValueControl[name="missingNofASDU"]'
+  'SampledValueControl[name="missingNofASDU"]',
 )!;
 const missingSmpOpts = scl.querySelector(
-  'SampledValueControl[name="missingSmpOpts"]'
+  'SampledValueControl[name="missingSmpOpts"]',
 )!;
 
 describe("Description for SCL schema type SampledValueControl", () => {
@@ -101,16 +101,16 @@ describe("Description for SCL schema type SampledValueControl", () => {
 
   it("returns same description with semantically equal SampledValueControl's", () =>
     expect(
-      JSON.stringify(describeSampledValueControl(baseSampledValueControl))
+      JSON.stringify(describeSampledValueControl(baseSampledValueControl)),
     ).to.equal(
-      JSON.stringify(describeSampledValueControl(equalSampledValueControl))
+      JSON.stringify(describeSampledValueControl(equalSampledValueControl)),
     ));
 
   it("returns different description with unequal SampledValueControl elements", () => {
     expect(
-      JSON.stringify(describeSampledValueControl(baseSampledValueControl))
+      JSON.stringify(describeSampledValueControl(baseSampledValueControl)),
     ).to.not.equal(
-      JSON.stringify(describeSampledValueControl(diffSampledValueControl))
+      JSON.stringify(describeSampledValueControl(diffSampledValueControl)),
     );
   });
 });

@@ -3,7 +3,7 @@ import {
   describeControlWithIEDName,
 } from "./ControlWithIEDName.js";
 
-type SmvOpts = {
+interface SmvOpts {
   /** SmvOpts attribute refreshTime defaulted to false */
   refreshTime: boolean;
   /** SmvOpts attribute sampleSynchronized defaulted to true */
@@ -18,7 +18,7 @@ type SmvOpts = {
   timestamp: boolean;
   /** SmvOpts attribute synchSourceId defaulted to false */
   synchSourceId: boolean;
-};
+}
 
 function smvOpts(element: Element): SmvOpts | undefined {
   const smvOpts = element.querySelector(":scope > SmvOpts");
@@ -60,7 +60,7 @@ export interface SampledValueControlDescription
 }
 
 export function describeSampledValueControl(
-  element: Element
+  element: Element,
 ): SampledValueControlDescription | undefined {
   const controlWithTriggerOptDesc = describeControlWithIEDName(element);
   if (!controlWithTriggerOptDesc) return;
@@ -95,7 +95,7 @@ export function describeSampledValueControl(
   };
 
   const protocol = Array.from(element.children).find(
-    (child) => child.tagName === "Protocol"
+    (child) => child.tagName === "Protocol",
   );
   if (protocol)
     gseControlDescription.protocol = { mustUnderstand: true, val: "R-SV" };

@@ -8,6 +8,7 @@ import {
   LNodeTypeDescription,
   isLNodeTypeDescription,
 } from "./LNodeType.js";
+import { LogControlDescription, describeLogControl } from "./LogControl.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
 import {
   ReportControlDescription,
@@ -17,6 +18,7 @@ import { describeVal, compareBySGroup } from "./Val.js";
 
 export interface LNDescription extends NamingDescription {
   reports: Record<string, ReportControlDescription>;
+  logControls: Record<string, LogControlDescription>;
   lnType: LNodeTypeDescription;
 }
 
@@ -66,6 +68,24 @@ function getNextDataType(
       ++index,
     );
   else return dataType.bdas[path[index]];
+}
+
+function logControls(element: Element): Record<string, LogControlDescription> {
+  const unsortedLogControls: Record<string, LogControlDescription> = {};
+
+  Array.from(element.children)
+    .filter((child) => child.tagName === "LogControl")
+    .forEach((logControl) => {
+      const name = logControl.getAttribute("name");
+      const logControlDescription = describeLogControl(logControl);
+      if (name && !unsortedLogControls[name] && logControlDescription)
+        unsortedLogControls[name] = logControlDescription;
+    });
+
+  return sortRecord(unsortedLogControls) as Record<
+    string,
+    LogControlDescription
+  >;
 }
 
 /** Returns leaf data attribute (BDA or DA) from
@@ -138,5 +158,6 @@ export function LN(element: Element): LNDescription | undefined {
     ...describeNaming(element),
     lnType,
     reports: reportControls(element),
+    logControls: logControls(element),
   };
 }

@@ -35,6 +35,10 @@ const scl = new DOMParser().parseFromString(
                             </SDI>
                         </SDI>
                     </DOI>
+                    <LogControl name="anotherLog" logName="logName" />
+                    <LogControl name="log" dataSet="baseDataSet" logName="logName" reasonCode="true" logEna="true" intgPd="0" bufTime="0" >
+                      <TrgOps dchg="false" qchg="false" dupd="false" period="false" gi="false" />
+                    </LogControl>
                     <ReportControl name="report" datSet="baseDataSet" intgPd="0" indexed="true" buffered="true" bufTime="0" confRev="0" >
                         <TrgOps dchg="false" qchg="false" dupd="false" period="false" gi="false" />
                         <OptFields seqNum="false" timeStamp="false" dataSet="false" reasonCode="false" dataRef="false" entryID="false" configRef="false" bufOvfl="false"/>
@@ -55,6 +59,8 @@ const scl = new DOMParser().parseFromString(
                     <FCDA iedName="IED1" ldInst="lDevice" prefix="" lnClass="LLN0" lnInst="" doName="Beh" daName="stVal" fc="ST" />
                     <FCDA iedName="IED1" ldInst="lDevice" lnClass="LLN0" doName="Beh" fc="ST" />
                   </DataSet>
+                  <LogControl name="log" dataSet="equalDataSet" logName="logName" />
+                  <LogControl name="anotherLog" logName="logName" />
                   <ReportControl name="anotherReport" />
                   <ReportControl name="report" datSet="equalDataSet" />
                 </LN>

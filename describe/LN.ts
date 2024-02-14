@@ -10,6 +10,7 @@ import {
 } from "./LNodeType.js";
 import { LogControlDescription, describeLogControl } from "./LogControl.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
+import { InputsDescription, describeInputs } from "./Inputs.js";
 import {
   ReportControlDescription,
   describeReportControl,
@@ -19,6 +20,7 @@ import { describeVal, compareBySGroup } from "./Val.js";
 export interface LNDescription extends NamingDescription {
   reports: Record<string, ReportControlDescription>;
   logControls: Record<string, LogControlDescription>;
+  inputs?: InputsDescription;
   lnType: LNodeTypeDescription;
 }
 
@@ -154,10 +156,17 @@ export function LN(element: Element): LNDescription | undefined {
 
   const lnType = updateValues(lNodeTypeDescriptions, instanceValues(element));
 
-  return {
+  const lnDescription: LNDescription = {
     ...describeNaming(element),
-    lnType,
     reports: reportControls(element),
     logControls: logControls(element),
+    lnType,
   };
+
+  const inputs = Array.from(element.children).find(
+    (child) => child.tagName === "Inputs",
+  );
+  if (inputs) lnDescription.inputs = describeInputs(inputs);
+
+  return lnDescription;
 }

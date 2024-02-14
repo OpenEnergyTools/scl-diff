@@ -1,4 +1,5 @@
 import { AccessPoint, AccessPointDescription } from "./describe/AccessPoint.js";
+import { IED, IEDDescription } from "./describe/IED.js";
 import { Private, PrivateDescription } from "./describe/Private.js";
 import { Text, TextDescription } from "./describe/Text.js";
 import { EnumType, EnumTypeDescription } from "./describe/EnumType.js";
@@ -24,7 +25,8 @@ export type Description =
   | LDeviceDescription
   | ServerDescription
   | ServicesDescription
-  | AccessPointDescription;
+  | AccessPointDescription
+  | IEDDescription;
 const sclElementDescriptors: Partial<
   Record<string, (element: Element) => Description | undefined>
 > = {
@@ -40,6 +42,7 @@ const sclElementDescriptors: Partial<
   Server,
   Services,
   AccessPoint,
+  IED,
 };
 
 export function describe(element: Element): Description | undefined {

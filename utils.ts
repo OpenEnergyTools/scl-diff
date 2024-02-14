@@ -1,4 +1,4 @@
-import { Certificate } from "./describe/AccessPoint.js";
+import { AccessPointDescription, Certificate } from "./describe/AccessPoint.js";
 import { DADescription } from "./describe/DADescription.js";
 import { DODescription } from "./describe/DODescription.js";
 import { GSEControlDescription } from "./describe/GSEControl.js";
@@ -11,6 +11,7 @@ import { SDODescription } from "./describe/SDODescription.js";
 import { SampledValueControlDescription } from "./describe/SampledValueControl.js";
 
 type SortedObjects =
+  | AccessPointDescription
   | Certificate
   | DADescription
   | GSEControlDescription

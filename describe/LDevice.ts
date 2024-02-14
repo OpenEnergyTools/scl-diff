@@ -1,7 +1,6 @@
 import { LN0, LN0Description } from "./LN0.js";
-import { LN, LNDescription } from "./LN.js";
+import { LNDescription, sortedLNDescriptions } from "./LN.js";
 import { NamingDescription, describeNaming } from "./Naming.js";
-import { sortRecord } from "../utils.js";
 
 export interface LDeviceDescription extends NamingDescription {
   /** LDevice attribute ldName */
@@ -21,36 +20,13 @@ export function LDevice(element: Element): LDeviceDescription | undefined {
   const ln0Description = LN0(ln0);
   if (!ln0Description) return;
 
-  const lns: Record<string, LNDescription> = {};
-  let existUndefinedLns = false;
-  Array.from(element.children)
-    .filter((child) => child.tagName === "LN")
-    .forEach((ln) => {
-      const prefix = ln.getAttribute("prefix");
-      const lnClass = ln.getAttribute("lnClass");
-      const inst = ln.getAttribute("inst");
-      if (!lnClass || !inst) {
-        existUndefinedLns = true;
-        return;
-      }
-
-      const id = `${prefix ? prefix : ""}${lnClass}${inst}`;
-
-      const lnDescription = LN(ln);
-      if (!lnDescription) {
-        existUndefinedLns = true;
-        return;
-      }
-
-      lns[id] = lnDescription;
-    });
-
-  if (existUndefinedLns) return;
+  const lns = sortedLNDescriptions(element);
+  if (!lns) return;
 
   const lDeviceDescription: LDeviceDescription = {
     ...describeNaming(element),
     ln0: ln0Description,
-    lns: sortRecord(lns) as Record<string, LNDescription>,
+    lns,
   };
 
   const ldName = element.getAttribute("ldName");

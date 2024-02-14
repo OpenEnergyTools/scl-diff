@@ -8,6 +8,7 @@ import { LNodeType, LNodeTypeDescription } from "./describe/LNodeType.js";
 import { LN, LNDescription } from "./describe/LN.js";
 import { LN0, LN0Description } from "./describe/LN0.js";
 import { Server, ServerDescription } from "./describe/Server.js";
+import { Services, ServicesDescription } from "./describe/Services.js";
 
 export type Description =
   | PrivateDescription
@@ -20,7 +21,8 @@ export type Description =
   | LNDescription
   | LN0Description
   | LDeviceDescription
-  | ServerDescription;
+  | ServerDescription
+  | ServicesDescription;
 const sclElementDescriptors: Partial<
   Record<string, (element: Element) => Description | undefined>
 > = {
@@ -34,6 +36,7 @@ const sclElementDescriptors: Partial<
   LN0,
   LDevice,
   Server,
+  Services,
 };
 
 export function describe(element: Element): Description | undefined {

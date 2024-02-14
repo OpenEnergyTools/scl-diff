@@ -11,15 +11,31 @@ const testScl = new DOMParser().parseFromString(
       <IED name="IED">
         <AccessPoint name="AP1">
           <Server>
-            <LDevice inst="ldInst">
-              <LN lnClass="XCBR" inst="" lnType="baseXCBR"/>
-              <LN lnClass="XCBR" inst="" lnType="equalXCBR"/>
-              <LN lnClass="XCBR" inst="" lnType="diffXCBR"/>
+            <LDevice inst="ldInst1">
+              <LN0 lnClass="LLN0" inst="" lnType="baseLLN0"/>
+              <LN lnClass="XCBR" inst="1" lnType="baseXCBR"/>
+              <LN lnClass="XCBR" inst="1" lnType="equalXCBR"/>
+              <LN lnClass="XCBR" inst="1" lnType="diffXCBR"/>
+            </LDevice>
+            <LDevice inst="ldInst2">
+              <LN0 lnClass="LLN0" inst="" lnType="equalLLN0"/>
+            </LDevice>
+            <LDevice inst="ldInst3">
+              <LN0 lnClass="LLN0" inst="" lnType="diffLLN0"/>
             </LDevice>
           </Server>
         </AccessPoint>
       </IED>
       <DataTypeTemplates>
+        <LNodeType lnClass="LLN0" id="baseLLN0" >
+          <DO name="Beh" type="someEqualDOType" />
+        </LNodeType>
+        <LNodeType lnClass="LLN0" id="equalLLN0" >
+          <DO name="Beh" type="someEqualDOType" />
+        </LNodeType>
+        <LNodeType lnClass="LLN0" id="diffLLN0" >
+          <DO name="Beh" type="someDiffDOType" />
+        </LNodeType>
         <LNodeType lnClass="XCBR" id="equalXCBR" >
           <DO name="Beh" type="someEqualDOType" />
         </LNodeType>
@@ -102,6 +118,10 @@ const baseLN = testScl.querySelector(`LN[lnType="baseXCBR"]`)!;
 const equalLN = testScl.querySelector(`LN[lnType="equalXCBR"]`)!;
 const diffLN = testScl.querySelector(`LN[lnType="diffXCBR"]`)!;
 
+const baseLN0 = testScl.querySelector(`LDevice[inst="ldInst1"]>LN0`)!;
+const equalLN0 = testScl.querySelector(`LDevice[inst="ldInst2"]>LN0`)!;
+const diffLN0 = testScl.querySelector(`LDevice[inst="ldInst3"]>LN0`)!;
+
 describe("Describe SCL elements function", () => {
   it("returns undefined with missing describe function", () =>
     expect(describeSclElement(oneNonSCLElement)).to.be.undefined);
@@ -117,6 +137,16 @@ describe("Describe SCL elements function", () => {
   it("return different description with semantically unequal SCL element", () =>
     expect(JSON.stringify(describeSclElement(diffEnumType))).to.not.equal(
       JSON.stringify(describeSclElement(equalEnumType)),
+    ));
+
+  it("returns same description with semantically equal LN0's", () =>
+    expect(JSON.stringify(describeSclElement(baseLN0))).to.equal(
+      JSON.stringify(describeSclElement(equalLN0)),
+    ));
+
+  it("returns different description with unequal LN0 elements", () =>
+    expect(JSON.stringify(describeSclElement(baseLN0))).to.not.equal(
+      JSON.stringify(describeSclElement(diffLN0)),
     ));
 
   it("returns same description with semantically equal LN's", () =>

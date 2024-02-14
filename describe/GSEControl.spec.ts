@@ -54,7 +54,7 @@ const scl = new DOMParser().parseFromString(
         </AccessPoint>
       </IED>
     </SCL>`,
-  "application/xml"
+  "application/xml",
 );
 
 const baseGSEControl = scl.querySelector(`*[datSet="baseDataSet"]`)!;
@@ -72,11 +72,11 @@ describe("Description for SCL schema type tControlWithIEDName", () => {
 
   it("returns same description with semantically equal GSEControl's", () =>
     expect(JSON.stringify(describeGSEControl(baseGSEControl))).to.equal(
-      JSON.stringify(describeGSEControl(equalGSEControl))
+      JSON.stringify(describeGSEControl(equalGSEControl)),
     ));
 
   it("returns different description with unequal GSEControl elements", () =>
     expect(JSON.stringify(describeGSEControl(baseGSEControl))).to.not.equal(
-      JSON.stringify(describeGSEControl(diffGSEControl))
+      JSON.stringify(describeGSEControl(diffGSEControl)),
     ));
 });

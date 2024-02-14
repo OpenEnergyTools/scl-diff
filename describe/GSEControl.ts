@@ -17,7 +17,7 @@ export interface GSEControlDescription extends ControlWithIEDNameDescription {
 }
 
 export function describeGSEControl(
-  element: Element
+  element: Element,
 ): GSEControlDescription | undefined {
   const controlWithTriggerOptDesc = describeControlWithIEDName(element);
   if (!controlWithTriggerOptDesc) return;
@@ -35,7 +35,7 @@ export function describeGSEControl(
   };
 
   const protocol = Array.from(element.children).find(
-    (child) => child.tagName === "Protocol"
+    (child) => child.tagName === "Protocol",
   );
   if (protocol)
     gseControlDescription.protocol = { mustUnderstand: true, val: "R-GOOSE" };

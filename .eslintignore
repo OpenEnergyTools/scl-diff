@@ -3,6 +3,4 @@ coverage
 dist
 doc
 
-**/*.spec.ts
-
 **/*.html

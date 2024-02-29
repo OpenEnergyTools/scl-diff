@@ -52,5 +52,8 @@
       "tsconfigRootDir": "."
     },
     "root": true
+  },
+  "dependencies": {
+    "xxhash-wasm": "^1.0.2"
   }
 }

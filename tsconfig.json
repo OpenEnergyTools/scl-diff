@@ -12,9 +12,7 @@
     "sourceMap": true,
     "declaration": true,
     "outDir": "dist",
-    "rootDir": "./",
+    "rootDir": "./"
   },
-  "files": [
-    "./describe.ts",
-  ],
+  "include": ["**/*.ts"]
 }

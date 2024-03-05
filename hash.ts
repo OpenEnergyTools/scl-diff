@@ -10,19 +10,6 @@ function isXmlTrue(val: string | null): boolean {
   return val !== null && xmlTruths.has(val.trim());
 }
 
-const fCs = new Set([
-  "ST",
-  "MX",
-  "CO",
-  "SP",
-  "SG",
-  "SE",
-  "SV",
-  "CF",
-  "DC",
-  "EX",
-]);
-
 /** Get count from referenced sibling element */
 function siblingCount(element: Element, name: string): number {
   const parent = element.parentElement;
@@ -41,43 +28,40 @@ function siblingCount(element: Element, name: string): number {
   return parseInt(count, 10);
 }
 
+const attributes: {
+  int: string[];
+  bool: string[];
+  defaults: Record<string, string | boolean | number>;
+} = {
+  int: ["count", "ord", "sGroup"],
+  bool: ["transient", "dchg", "dupd", "qchg"],
+  defaults: { fc: "ST" },
+};
+
 export function hasher(
   db: HashDB,
-  { hashDesc = true, hashENS }: { hashDesc?: boolean; hashENS?: string[] } = {},
+  {
+    ignoreAttrs = new Set(["desc", "id", "name", "type"]),
+    hashENS,
+  }: { ignoreAttrs?: Set<string>; hashENS?: string[] } = {},
 ): (e: Element) => string {
-  function describeAttributes(
-    e: Element,
-    {
-      str = [],
-      int = [],
-      bool = [],
-      defaults = {},
-    }: {
-      str?: string[];
-      int?: string[];
-      bool?: string[];
-      defaults?: Record<string, string | number | boolean>;
-    },
-  ) {
+  function describeAttributes(e: Element) {
     const description: Record<string, string | number | boolean> = {};
 
-    str.forEach((name) => {
-      if (name in defaults) description[name] = defaults[name];
-      const val = e.getAttribute(name);
-      if (val) description[name] = val;
-    });
+    const { int, bool, defaults } = attributes;
 
-    int.forEach((name) => {
-      if (name in defaults) description[name] = defaults[name];
-      const val = e.getAttribute(name);
-      if (val) description[name] = Number.parseInt(val ?? "", 10);
-    });
-
-    bool.forEach((name) => {
-      if (name in defaults) description[name] = defaults[name];
-      const val = isXmlTrue(e.getAttribute(name));
-      if (val) description[name] = true;
-    });
+    Array.from(e.attributes)
+      .map((a) => a.localName)
+      .filter((a) => !ignoreAttrs.has(a))
+      .sort()
+      .forEach((name) => {
+        if (name in defaults) description[name] = defaults[name];
+        let val: string | number | boolean | null = e.getAttribute(name);
+        if (!val) return;
+        if (int.includes(name)) val = Number.parseInt(val ?? "", 10);
+        if (bool.includes(name)) val = isXmlTrue(val as string);
+        description[name] = val;
+      });
 
     return description;
   }
@@ -95,13 +79,14 @@ export function hasher(
     return description;
   }
 
-  function describeNaming(e: Element, ...children: string[]) {
-    const description: Record<string, unknown> = describeChildren(
-      e,
-      "Private",
-      "Text",
-      ...children,
-    );
+  function describeNaming(e: Element) {
+    const children = Array.from(e.children)
+      .map((c) => c.tagName)
+      .filter((c, i, arr) => arr.indexOf(c) === i);
+    const description: Record<string, unknown> = {
+      ...describeChildren(e, "Private", "Text", ...children),
+      ...describeAttributes(e),
+    };
     const eNSAttrs = Array.from(e.attributes).filter((a) => a.namespaceURI);
     if (eNSAttrs.length) {
       const eNS = {} as Record<string, Record<string, string>>;
@@ -115,7 +100,7 @@ export function hasher(
         });
       description.eNS = eNS;
     }
-    if (hashDesc) {
+    if (!ignoreAttrs.has("desc")) {
       const desc = e.getAttribute("desc");
       if (desc) description.desc = desc;
     }
@@ -124,7 +109,7 @@ export function hasher(
 
   function describeBDA(e: Element) {
     const description: Record<string, unknown> = {
-      ...describeNaming(e, "Val"),
+      ...describeNaming(e),
       bType: e.getAttribute("bType"),
       valKind: "Set",
       valImport: false,
@@ -144,7 +129,7 @@ export function hasher(
     if (valKind && ["Spec", "Conf", "RO", "Set"].includes(valKind))
       description.valKind = valKind as "Spec" | "RO" | "Conf" | "Set";
 
-    if (valImport && valImport === "true") description.valImport = true;
+    if (isXmlTrue(valImport)) description.valImport = true;
 
     if (count && /^\d+$/.test(count) && !isNaN(parseInt(count, 10)))
       // count can be an unsigned integer
@@ -166,16 +151,8 @@ export function hasher(
     const description = {
       ...describeChildren(e, "ProtNs"),
       ...describeBDA(e),
-      fc: "ST",
+      ...describeAttributes(e),
     } as Record<string, unknown>;
-
-    const [dchg, qchg, dupd, fc] = ["dchg", "qchg", "dupd", "fc"].map((attr) =>
-      e.getAttribute(attr),
-    );
-    if (isXmlTrue(dchg)) description.dchg = true;
-    if (isXmlTrue(qchg)) description.qchg = true;
-    if (isXmlTrue(dupd)) description.dupd = true;
-    if (fc && fCs.has(fc)) description.fc = fc;
 
     return description;
   }
@@ -183,20 +160,30 @@ export function hasher(
   const descriptions: Record<string, (e: Element) => object> = {
     BDA: describeBDA,
     DA: describeDA,
-    DAType: (e) => describeNaming(e, "BDA", "ProtNs"),
-    DOType: (e) => describeNaming(e, "DA", "SDO"),
-    EnumType: (e) => describeNaming(e, "EnumVal"),
-    EnumVal: (e) =>
-      Object.assign(
-        {
-          ord: parseInt(e.getAttribute("ord") ?? "", 10),
-          val: e.textContent ?? "",
-        },
-        hashDesc && e.getAttribute("desc") && { desc: e.getAttribute("desc") },
-      ) as object,
+    DataTypeTemplates: describeNaming,
+    DAType: (e) => describeNaming(e),
+    DO: (e) => {
+      const template = Array.from(
+        e.closest("DataTypeTemplates")?.children ?? [],
+      ).find((child) => child.getAttribute("id") === e.getAttribute("type"));
+      return {
+        ...describeAttributes(e),
+        ...describeNaming(e),
+        [`@${template?.tagName}`]: template ? [hash(template)] : [],
+      };
+    },
+    DOType: (e) => ({
+      ...describeAttributes(e),
+      ...describeNaming(e),
+    }),
+    EnumType: (e) => describeNaming(e),
+    EnumVal: (e) => ({
+      ...describeNaming(e),
+      val: e.textContent ?? "",
+    }),
     LNodeType: (e) => ({
-      ...describeNaming(e, "DO"),
-      ...describeAttributes(e, { str: ["lnClass", "iedType"] }),
+      ...describeNaming(e),
+      ...describeAttributes(e),
     }),
     ProtNs: (e) => ({
       // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing

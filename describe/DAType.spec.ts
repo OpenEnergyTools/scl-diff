@@ -44,7 +44,7 @@ describe("Description for SCL schema element DAType", () => {
   });
 
   it("returns property bdas recording BDA child elements", () =>
-    expect(DAType(baseDAType).bdas["mag"]).to.satisfy(
+    expect(DAType(baseDAType).bdas.mag).to.satisfy(
       isAbstractDataAttributeDescription,
     ));
 

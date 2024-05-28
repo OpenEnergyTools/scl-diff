@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<title>OpenSCD Core Demo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&display=block">
+<label for="scl1">SCL file 1</label>
+<input type="file" id="scl1" name="scl1" accept="application/xml" />
+
+<hr>
+
+<div id="result">
+</div>
+
+<script type="module">
+  import { newHasher } from '../dist/hash.js';
+
+const scl1 = document.getElementById('scl1');
+const result = document.getElementById('result');
+
+const { hash, db } = newHasher();
+
+function display(description) {
+  console.log('displaying', description);
+  const elements = [];
+      Object.entries(description).forEach(([key, value]) => {
+        if (key.startsWith('@')) {
+          const tag = key.substring(1);
+          for (const hash of value) {
+            const det = document.createElement('details');
+            const sum = document.createElement('summary');
+            det.append(sum);
+            const d = db[tag][hash];
+            sum.textContent = tag + ' ' + hash;
+            det.addEventListener('toggle', () => {if (det.children.length < 2) det.append(...display(db[tag][hash]))})
+            elements.push(det);
+          }
+        } else if ( key === 'eNS') {
+            const det = document.createElement('details');
+            const sum = document.createElement('summary');
+            det.append(sum);
+            sum.textContent = 'extension NS';
+            Object.entries(value).forEach(([ns, attrs]) => {
+              const de = document.createElement('details');
+              const su = document.createElement('summary');
+              de.append(su);
+              su.textContent = ns;
+              Object.entries(attrs).forEach(([a,v]) => {
+                const attr = document.createElement('div');
+                attr.setAttribute('class','column');
+                attr.textContent = a
+                de.append(attr);
+                const val = document.createElement('div');
+                val.setAttribute('class','column');
+                val.textContent = v
+                de.append(val);
+              })
+            })
+        } else {
+          const attr = document.createElement('div');
+          attr.setAttribute('class','column');
+          attr.textContent = key
+          elements.push(attr);
+          const val = document.createElement('div');
+          val.setAttribute('class','column');
+          val.textContent = value
+          elements.push(val);
+        }
+      })
+  return elements;
+}
+
+scl1.addEventListener('change', e => {
+  for (const file of scl1.files) {
+    file.text().then(text => {
+      console.log(hash(new DOMParser().parseFromString(text, 'application/xml').documentElement))
+      Object.entries(db.SCL).forEach(([sclHash, description]) => {
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        details.setAttribute('open', '')
+        details.append(summary);
+        summary.textContent = 'SCL ' + sclHash;
+        Object.entries(description).forEach(([key, value]) => {
+          if (key.startsWith('@')) {
+            const tag = key.substring(1);
+            for (const hash of value) {
+              const det = document.createElement('details');
+              const sum = document.createElement('summary');
+              det.append(sum);
+              sum.textContent = tag + ' ' + hash;
+              det.addEventListener('toggle', () => {console.log('toggled!'); if (det.children.length < 2) det.append(...display(db[tag][hash]))})
+              details.append(det);
+            }
+          } else if ( key === 'eNS') {
+              const det = document.createElement('details');
+              const sum = document.createElement('summary');
+              det.append(sum);
+              sum.textContent = 'extension NS';
+              Object.entries(value).forEach(([ns, attrs]) => {
+                const de = document.createElement('details');
+                const su = document.createElement('summary');
+                de.append(su);
+                su.textContent = ns;
+                Object.entries(attrs).forEach(([a,v]) => {
+                  const attr = document.createElement('div');
+                  attr.setAttribute('class','column');
+                  attr.textContent = a
+                  de.append(attr);
+                  const val = document.createElement('div');
+                  val.setAttribute('class','column');
+                  val.textContent = v
+                  de.append(val);
+                })
+              })
+          } else {
+            const attr = document.createElement('div');
+            attr.setAttribute('class','column');
+            attr.textContent = key
+            details.append(attr);
+            const val = document.createElement('div');
+            val.setAttribute('class','column');
+            val.textContent = value
+            details.append(val);
+          }
+        })
+        result.append(details);
+      })
+    })
+  }
+});
+</script>
+
+<style>
+body {
+  background: #ccc;
+  color: #222;
+  font-family: Roboto;
+  font-weight: 300;
+}
+.column {
+  max-width: 49%;
+  min-width: 34%;
+  display: inline-block;
+  padding: 4px;
+  opacity: 0.8;
+  vertical-align: middle;
+  border: 1px #ccc solid;
+  border-radius: 6px;
+}
+.column:nth-of-type(2n+1) {
+  text-align: right;
+}
+.removed {
+  background: lightcoral;
+}
+.changed {
+  background: gold;
+}
+.added {
+  background: lightgreen;
+}
+details {
+  padding: 4px;
+}
+summary {
+  font-weight: 400;
+}
+</style>

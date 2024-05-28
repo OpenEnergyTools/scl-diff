@@ -15,6 +15,7 @@
     "url": "https://github.com/OpenEnergyTools/scl-diff.git"
   },
   "scripts": {
+    "start": "npm run build && concurrently -k -r \"tsc -b --watch --preserveWatchOutput\" \"wds\"",
     "lint": "eslint --ext .ts,.html . && prettier \"**/*.ts\" --check ",
     "format": "eslint --ext .ts,.html . --fix && prettier \"**/*.ts\" --write",
     "test": "wtr --coverage",

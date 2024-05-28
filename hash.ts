@@ -33,15 +33,31 @@ const attributes: {
   bool: string[];
   defaults: Record<string, string | boolean | number>;
 } = {
-  int: ["count", "ord", "sGroup"],
-  bool: ["transient", "dchg", "dupd", "qchg"],
-  defaults: { fc: "ST" },
+  int: ["count", "ord", "sGroup", "serialNumber", "timeout", "nameLength"],
+  bool: [
+    "transient",
+    "dchg",
+    "dupd",
+    "qchg",
+    "router",
+    "clock",
+    "kdc",
+    "GetDirectory",
+    "GetDataObjectDefinition",
+    "DataObjectDirectory",
+    "GetDataSetValue",
+    "SetDataSetValue",
+    "DataSetDirectory",
+    "ReadWrite",
+    "TimerActivatedControl",
+  ],
+  defaults: { fc: "ST", timeout: 30 },
 };
 
 export function hasher(
   db: HashDB,
   {
-    ignoreAttrs = new Set(["desc", "id", "name", "type"]),
+    ignoreAttrs = new Set(["desc", "id", "name", "type", "inst", "lnType"]),
     hashENS,
   }: { ignoreAttrs?: Set<string>; hashENS?: string[] } = {},
 ): (e: Element) => string {
@@ -84,7 +100,7 @@ export function hasher(
       .map((c) => c.tagName)
       .filter((c, i, arr) => arr.indexOf(c) === i);
     const description: Record<string, unknown> = {
-      ...describeChildren(e, "Private", "Text", ...children),
+      ...describeChildren(e, ...children),
       ...describeAttributes(e),
     };
     const eNSAttrs = Array.from(e.attributes).filter((a) => a.namespaceURI);
@@ -149,19 +165,18 @@ export function hasher(
 
   function describeDA(e: Element) {
     const description = {
-      ...describeChildren(e, "ProtNs"),
       ...describeBDA(e),
-      ...describeAttributes(e),
     } as Record<string, unknown>;
 
     return description;
   }
 
   const descriptions: Record<string, (e: Element) => object> = {
+    AccessPoint: describeNaming,
     BDA: describeBDA,
     DA: describeDA,
     DataTypeTemplates: describeNaming,
-    DAType: (e) => describeNaming(e),
+    DAType: describeNaming,
     DO: (e) => {
       const template = Array.from(
         e.closest("DataTypeTemplates")?.children ?? [],
@@ -173,7 +188,6 @@ export function hasher(
       };
     },
     DOType: (e) => ({
-      ...describeAttributes(e),
       ...describeNaming(e),
     }),
     EnumType: (e) => describeNaming(e),
@@ -181,15 +195,34 @@ export function hasher(
       ...describeNaming(e),
       val: e.textContent ?? "",
     }),
+    IED: (e) => describeNaming(e),
+    LDevice: describeNaming,
+    LN0: (e) => ({
+      ...describeAttributes(e),
+      ["@LNodeType"]: Array.from(
+        e.ownerDocument.querySelectorAll(
+          `DataTypeTemplates > LNodeType[id="${e.getAttribute("lnType")}"]`,
+        ),
+      ).map(hash),
+    }),
+    LN: (e) => ({
+      ...describeAttributes(e),
+      ["@LNodeType"]: Array.from(
+        e.ownerDocument.querySelectorAll(
+          `DataTypeTemplates > LNodeType[id="${e.getAttribute("lnType")}"]`,
+        ),
+      ).map(hash),
+    }),
     LNodeType: (e) => ({
       ...describeNaming(e),
-      ...describeAttributes(e),
     }),
     ProtNs: (e) => ({
       // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       type: e.getAttribute("type") || "8-MMS",
       val: e.textContent ?? "",
     }),
+    Server: describeNaming,
+    Services: describeNaming,
     Val: (e) =>
       Object.assign(
         { val: e.textContent ?? "" },
@@ -201,7 +234,8 @@ export function hasher(
 
   function describe(e: Element) {
     if (e.tagName in descriptions) return descriptions[e.tagName](e);
-    return { xml: e.outerHTML };
+    else if (e.tagName === "Private") return { xml: e.outerHTML };
+    return describeNaming(e);
   }
 
   function hash(e: Element) {

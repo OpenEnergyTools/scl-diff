@@ -29,7 +29,7 @@ function display(description) {
             const sum = document.createElement('summary');
             det.append(sum);
             const d = db[tag][hash];
-            sum.textContent = tag + ' ' + (idDb[hash] || hash);
+            sum.textContent = tag + ' ' + (idDb[hash] || ' ') + ' (' + hash + ')';
             det.addEventListener('toggle', () => {if (det.children.length < 2) det.append(...display(db[tag][hash]))})
             elements.push(det);
           }
@@ -90,7 +90,7 @@ scl1.addEventListener('change', e => {
               const det = document.createElement('details');
               const sum = document.createElement('summary');
               det.append(sum);
-              sum.textContent = tag + ' ' + (idDb[hash] || hash);
+              sum.textContent = tag + ' ' + (idDb[hash] || ' ') + ' (' + hash + ')';
               det.addEventListener('toggle', () => {console.log('toggled!'); if (det.children.length < 2) det.append(...display(db[tag][hash]))})
               details.append(det);
             }

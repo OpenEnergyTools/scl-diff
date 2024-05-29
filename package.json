@@ -1,0 +1,61 @@
+{
+  "name": "@openenergytools/scl-diff",
+  "description": "Function library supporting SCL diffing",
+  "license": "Apache-2.0",
+  "author": "Jakob Vogelsang",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/describe.js",
+  "types": "./dist/describe.d.ts",
+  "files": [
+    "/dist/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenEnergyTools/scl-diff.git"
+  },
+  "scripts": {
+    "start": "npm run build && concurrently -k -r \"tsc -b --watch --preserveWatchOutput\" \"wds\"",
+    "lint": "eslint --ext .ts,.html . && prettier \"**/*.ts\" --check ",
+    "format": "eslint --ext .ts,.html . --fix && prettier \"**/*.ts\" --write",
+    "test": "wtr --coverage",
+    "test:watch": "wtr --watch --coverage",
+    "doc": "npx rimraf doc && typedoc --out doc describe.ts",
+    "deploy": "npm run doc && npm run build && gh-pages --dist '.'",
+    "build": "npx rimraf dist && tsc"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@web/dev-server-esbuild": "^0.4.1",
+    "@web/test-runner": "^0.16.1",
+    "chai": "npm:@esm-bundle/chai@^4.3.4-fix.0",
+    "concurrently": "^8.0.1",
+    "eslint": "^8.40.0",
+    "gh-pages": "^5.0.0",
+    "prettier": "^3.2.5",
+    "typedoc": "^0.24.7",
+    "typescript": "^5.0.4"
+  },
+  "eslintConfig": {
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended-type-checked",
+      "plugin:@typescript-eslint/stylistic-type-checked"
+    ],
+    "parserOptions": {
+      "project": true,
+      "tsconfigRootDir": "."
+    },
+    "root": true
+  },
+  "dependencies": {
+    "@openenergytools/scl-lib": "^0.13.3",
+    "xxhash-wasm": "^1.0.2"
+  }
+}

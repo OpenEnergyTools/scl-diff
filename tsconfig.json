@@ -14,5 +14,5 @@
     "outDir": "dist",
     "rootDir": "./"
   },
-  "include": ["**/*.ts", "demo/*.html"]
+  "include": ["**/*.ts"]
 }

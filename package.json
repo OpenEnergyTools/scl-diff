@@ -55,6 +55,7 @@
     "root": true
   },
   "dependencies": {
+    "@openenergytools/scl-lib": "^0.13.3",
     "xxhash-wasm": "^1.0.2"
   }
 }

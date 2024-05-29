@@ -16,7 +16,7 @@
 const scl1 = document.getElementById('scl1');
 const result = document.getElementById('result');
 
-const { hash, db } = newHasher();
+const { hash, db, idDb } = newHasher();
 
 function display(description) {
   console.log('displaying', description);
@@ -29,18 +29,21 @@ function display(description) {
             const sum = document.createElement('summary');
             det.append(sum);
             const d = db[tag][hash];
-            sum.textContent = tag + ' ' + hash;
+            sum.textContent = tag + ' ' + (idDb[hash] || hash);
             det.addEventListener('toggle', () => {if (det.children.length < 2) det.append(...display(db[tag][hash]))})
             elements.push(det);
           }
         } else if ( key === 'eNS') {
+        console.log('ens!', value);
             const det = document.createElement('details');
             const sum = document.createElement('summary');
+            det.setAttribute('open', '');
             det.append(sum);
             sum.textContent = 'extension NS';
             Object.entries(value).forEach(([ns, attrs]) => {
               const de = document.createElement('details');
               const su = document.createElement('summary');
+              de.setAttribute('open', '');
               de.append(su);
               su.textContent = ns;
               Object.entries(attrs).forEach(([a,v]) => {
@@ -53,7 +56,9 @@ function display(description) {
                 val.textContent = v
                 de.append(val);
               })
+              det.append(de)
             })
+            elements.push(det);
         } else {
           const attr = document.createElement('div');
           attr.setAttribute('class','column');
@@ -85,31 +90,36 @@ scl1.addEventListener('change', e => {
               const det = document.createElement('details');
               const sum = document.createElement('summary');
               det.append(sum);
-              sum.textContent = tag + ' ' + hash;
+              sum.textContent = tag + ' ' + (idDb[hash] || hash);
               det.addEventListener('toggle', () => {console.log('toggled!'); if (det.children.length < 2) det.append(...display(db[tag][hash]))})
               details.append(det);
             }
           } else if ( key === 'eNS') {
-              const det = document.createElement('details');
-              const sum = document.createElement('summary');
-              det.append(sum);
-              sum.textContent = 'extension NS';
-              Object.entries(value).forEach(([ns, attrs]) => {
-                const de = document.createElement('details');
-                const su = document.createElement('summary');
-                de.append(su);
-                su.textContent = ns;
-                Object.entries(attrs).forEach(([a,v]) => {
-                  const attr = document.createElement('div');
-                  attr.setAttribute('class','column');
-                  attr.textContent = a
-                  de.append(attr);
-                  const val = document.createElement('div');
-                  val.setAttribute('class','column');
-                  val.textContent = v
-                  de.append(val);
-                })
+            console.log('ens!', value);
+            const det = document.createElement('details');
+            const sum = document.createElement('summary');
+            det.setAttribute('open', '');
+            det.append(sum);
+            sum.textContent = 'extension NS';
+            Object.entries(value).forEach(([ns, attrs]) => {
+              const de = document.createElement('details');
+              const su = document.createElement('summary');
+              de.setAttribute('open', '');
+              de.append(su);
+              su.textContent = ns;
+              Object.entries(attrs).forEach(([a,v]) => {
+                const attr = document.createElement('div');
+                attr.setAttribute('class','column');
+                attr.textContent = a
+                de.append(attr);
+                const val = document.createElement('div');
+                val.setAttribute('class','column');
+                val.textContent = v
+                de.append(val);
               })
+              det.append(de)
+            })
+            details.append(det);
           } else {
             const attr = document.createElement('div');
             attr.setAttribute('class','column');
@@ -130,8 +140,8 @@ scl1.addEventListener('change', e => {
 
 <style>
 body {
-  background: #ccc;
-  color: #222;
+  background: #edc;
+  color: #014;
   font-family: Roboto;
   font-weight: 300;
 }
@@ -142,7 +152,7 @@ body {
   padding: 4px;
   opacity: 0.8;
   vertical-align: middle;
-  border: 1px #ccc solid;
+  border: 1px #edc solid;
   border-radius: 6px;
 }
 .column:nth-of-type(2n+1) {

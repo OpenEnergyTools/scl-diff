@@ -1,8 +1,10 @@
 import xxhash from "xxhash-wasm";
+import { identity } from "@openenergytools/scl-lib";
 
 const xxh = await xxhash();
 
 export type HashDB = Record<string, Record<string, object>>;
+export type IdentityDB = Record<string, string | number>;
 export type Hasher = (e: Element) => string;
 
 const xmlTruths = new Set(["true", "1"]);
@@ -56,8 +58,18 @@ const attributes: {
 
 export function hasher(
   db: HashDB,
+  idDb: IdentityDB,
   {
-    ignoreAttrs = new Set(["desc", "id", "name", "type", "inst", "lnType"]),
+    ignoreAttrs = new Set([
+      "desc",
+      "id",
+      "name",
+      "DO.type",
+      "DA.type",
+      "BDA.type",
+      "inst",
+      "lnType",
+    ]),
     hashENS,
   }: { ignoreAttrs?: Set<string>; hashENS?: string[] } = {},
 ): (e: Element) => string {
@@ -69,6 +81,7 @@ export function hasher(
     Array.from(e.attributes)
       .map((a) => a.localName)
       .filter((a) => !ignoreAttrs.has(a))
+      .filter((a) => !ignoreAttrs.has(e.tagName + "." + a))
       .sort()
       .forEach((name) => {
         if (name in defaults) description[name] = defaults[name];
@@ -100,8 +113,8 @@ export function hasher(
       .map((c) => c.tagName)
       .filter((c, i, arr) => arr.indexOf(c) === i);
     const description: Record<string, unknown> = {
-      ...describeChildren(e, ...children),
       ...describeAttributes(e),
+      ...describeChildren(e, ...children),
     };
     const eNSAttrs = Array.from(e.attributes).filter((a) => a.namespaceURI);
     if (eNSAttrs.length) {
@@ -247,13 +260,21 @@ export function hasher(
     const digest = xxh.h64ToString(JSON.stringify(description));
     if (!(tag in db)) db[tag] = {};
     if (!(digest in db[tag])) db[tag][digest] = description;
+    if (!(digest in idDb)) {
+      idDb[digest] = identity(e);
+    }
     return digest;
   }
 
   return hash;
 }
 
-export function newHasher(options = {}): { hash: Hasher; db: HashDB } {
+export function newHasher(options = {}): {
+  hash: Hasher;
+  db: HashDB;
+  idDb: IdentityDB;
+} {
   const db: HashDB = {};
-  return { hash: hasher(db, options), db };
+  const idDb: IdentityDB = {};
+  return { hash: hasher(db, idDb, options), db, idDb };
 }

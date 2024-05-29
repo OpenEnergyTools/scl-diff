@@ -21,7 +21,7 @@
     "test": "wtr --coverage",
     "test:watch": "wtr --watch --coverage",
     "doc": "npx rimraf doc && typedoc --out doc describe.ts",
-    "deploy": "npm run doc && gh-pages --dist 'doc'",
+    "deploy": "npm run doc && npm run build && gh-pages --dist '.'",
     "build": "npx rimraf dist && tsc"
   },
   "devDependencies": {

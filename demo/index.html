@@ -12,14 +12,14 @@
 
 <script type="module">
   import { newHasher } from '../dist/hash.js';
+  import { identity } from '@openenergytools/scl-lib';
 
 const scl1 = document.getElementById('scl1');
 const result = document.getElementById('result');
 
-const { hash, db, idDb } = newHasher();
+const { hash, db, eDb } = newHasher();
 
 function display(description) {
-  console.log('displaying', description);
   const elements = [];
       Object.entries(description).forEach(([key, value]) => {
         if (key.startsWith('@')) {
@@ -29,12 +29,11 @@ function display(description) {
             const sum = document.createElement('summary');
             det.append(sum);
             const d = db[tag][hash];
-            sum.textContent = tag + ' ' + (idDb[hash] || ' ') + ' (' + hash + ')';
+            sum.textContent = tag + ' ' + (identity(eDb.h2e.get(hash)) || ' ') + ' (' + hash + ')';
             det.addEventListener('toggle', () => {if (det.children.length < 2) det.append(...display(db[tag][hash]))})
             elements.push(det);
           }
         } else if ( key === 'eNS') {
-        console.log('ens!', value);
             const det = document.createElement('details');
             const sum = document.createElement('summary');
             det.setAttribute('open', '');
@@ -76,7 +75,11 @@ function display(description) {
 scl1.addEventListener('change', e => {
   for (const file of scl1.files) {
     file.text().then(text => {
+    const t0 = (new Date().getTime());
       console.log(hash(new DOMParser().parseFromString(text, 'application/xml').documentElement))
+    const t1 = (new Date().getTime());
+    console.warn((t1 - t0) / 60000, 'min')
+    console.warn((t1 - t0) / 1000, 'sec')
       Object.entries(db.SCL).forEach(([sclHash, description]) => {
         const details = document.createElement('details');
         const summary = document.createElement('summary');
@@ -90,12 +93,11 @@ scl1.addEventListener('change', e => {
               const det = document.createElement('details');
               const sum = document.createElement('summary');
               det.append(sum);
-              sum.textContent = tag + ' ' + (idDb[hash] || ' ') + ' (' + hash + ')';
-              det.addEventListener('toggle', () => {console.log('toggled!'); if (det.children.length < 2) det.append(...display(db[tag][hash]))})
+              sum.textContent = tag + ' ' + (identity(eDb.h2e.get(hash)) || ' ') + ' (' + hash + ')';
+              det.addEventListener('toggle', () => {if (det.children.length < 2) det.append(...display(db[tag][hash]))})
               details.append(det);
             }
           } else if ( key === 'eNS') {
-            console.log('ens!', value);
             const det = document.createElement('details');
             const sum = document.createElement('summary');
             det.setAttribute('open', '');

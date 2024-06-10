@@ -1,5 +1,4 @@
 import xxhash from "xxhash-wasm";
-import { identity } from "@openenergytools/scl-lib";
 
 const xxh = await xxhash();
 
@@ -56,9 +55,14 @@ const attributes: {
   defaults: { fc: "ST", timeout: 30 },
 };
 
+interface ElementDB {
+  e2h: WeakMap<Element, string>;
+  h2e: Map<string, Element>;
+}
+
 export function hasher(
   db: HashDB,
-  idDb: IdentityDB,
+  eDb: ElementDB,
   {
     ignoreAttrs = new Set([
       "desc",
@@ -176,18 +180,10 @@ export function hasher(
     return description;
   }
 
-  function describeDA(e: Element) {
-    const description = {
-      ...describeBDA(e),
-    } as Record<string, unknown>;
-
-    return description;
-  }
-
   const descriptions: Record<string, (e: Element) => object> = {
     AccessPoint: describeNaming,
     BDA: describeBDA,
-    DA: describeDA,
+    DA: describeBDA,
     DataTypeTemplates: describeNaming,
     DAType: describeNaming,
     DO: (e) => {
@@ -251,7 +247,8 @@ export function hasher(
     return describeNaming(e);
   }
 
-  function hash(e: Element) {
+  function hash(e: Element): string {
+    if (eDb.e2h.has(e)) return eDb.e2h.get(e)!;
     const tag =
       e.namespaceURI === e.ownerDocument.documentElement.namespaceURI
         ? e.localName
@@ -260,8 +257,9 @@ export function hasher(
     const digest = xxh.h64ToString(JSON.stringify(description));
     if (!(tag in db)) db[tag] = {};
     if (!(digest in db[tag])) db[tag][digest] = description;
-    if (!(digest in idDb)) {
-      idDb[digest] = identity(e);
+    if (!eDb.h2e.has(digest)) {
+      eDb.h2e.set(digest, e);
+      eDb.e2h.set(e, digest);
     }
     return digest;
   }
@@ -272,9 +270,9 @@ export function hasher(
 export function newHasher(options = {}): {
   hash: Hasher;
   db: HashDB;
-  idDb: IdentityDB;
+  eDb: ElementDB;
 } {
   const db: HashDB = {};
-  const idDb: IdentityDB = {};
-  return { hash: hasher(db, idDb, options), db, idDb };
+  const eDb: ElementDB = { e2h: new WeakMap(), h2e: new Map() };
+  return { hash: hasher(db, eDb, options), db, eDb };
 }

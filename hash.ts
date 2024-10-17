@@ -57,7 +57,7 @@ const attributes: {
 
 interface ElementDB {
   e2h: WeakMap<Element, string>;
-  h2e: Map<string, Element>;
+  h2e: Map<string, Set<Element>>;
 }
 
 export function hasher(
@@ -257,10 +257,9 @@ export function hasher(
     const digest = xxh.h64ToString(JSON.stringify(description));
     if (!(tag in db)) db[tag] = {};
     if (!(digest in db[tag])) db[tag][digest] = description;
-    if (!eDb.h2e.has(digest)) {
-      eDb.h2e.set(digest, e);
-      eDb.e2h.set(e, digest);
-    }
+    if (!eDb.h2e.has(digest)) eDb.h2e.set(digest, new Set<Element>().add(e));
+    else if (!eDb.h2e.get(digest)!.has(e)) eDb.h2e.get(digest)!.add(e);
+    if (!eDb.e2h.has(e)) eDb.e2h.set(e, digest);
     return digest;
   }
 

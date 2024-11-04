@@ -29,36 +29,646 @@ function siblingCount(element: Element, name: string): number {
   return parseInt(count, 10);
 }
 
-const attributes: {
-  int: string[];
-  bool: string[];
-  defaults: Record<string, string | boolean | number>;
-} = {
-  int: ["count", "ord", "sGroup", "serialNumber", "timeout", "nameLength"],
-  bool: [
-    "transient",
-    "dchg",
-    "dupd",
-    "qchg",
-    "router",
-    "clock",
-    "kdc",
-    "GetDirectory",
-    "GetDataObjectDefinition",
-    "DataObjectDirectory",
-    "GetDataSetValue",
-    "SetDataSetValue",
-    "DataSetDirectory",
-    "ReadWrite",
-    "TimerActivatedControl",
-  ],
-  defaults: { fc: "ST", timeout: 30 },
-};
-
 interface ElementDB {
   e2h: WeakMap<Element, string>;
   h2e: Map<string, Set<Element>>;
 }
+
+const identifiers: Record<string, string[]> = {
+  DAI: ["name", "ix"],
+  SMV: ["ldInst", "cbName"],
+  LNode: ["iedName", "ldInst", "prefix", "lnClass", "lnInst", "lnType"],
+  /* FCDA: [
+    "ldInst",
+    "prefix",
+    "lnClass",
+    "lnInst",
+    "doName",
+    "daName",
+    "fc",
+    "ix",
+    ], */
+  ConnectedAP: ["iedName", "apName"],
+  ExtRef: [
+    "iedName",
+    "intAddr",
+    "ldInst",
+    "prefix",
+    "lnClass",
+    "lnInst",
+    "doName",
+    "daName",
+    "serviceType",
+    "srcLDInst",
+    "srcPrefix",
+    "srcLNClass",
+    "srcLNInst",
+    "srcCBName",
+  ],
+  Terminal: ["connectivityNode"],
+  SDI: ["name", "ix"],
+  LN0: ["prefix", "lnClass", "inst"],
+  GSE: ["ldInst", "cbName"],
+  Hitem: ["version", "revision"],
+  LDevice: ["IED", "inst"],
+  IEDName: ["apRef", "ldInst", "prefix", "lnClass", "lnInst"],
+  PhysConn: ["type"],
+  Association: ["iedName", "ldInst", "prefix", "lnClass", "lnInst", "lnType"],
+  ClientLN: ["apRef", "iedName", "ldInst", "prefix", "lnClass", "lnInst"],
+  KDC: ["iedName", "apName"],
+  LN: ["prefix", "lnClass", "inst"],
+};
+
+interface Reference {
+  fields: { to: string; from: string }[];
+  to: string;
+  from: string;
+  scope: string;
+}
+
+const references: Record<string, Reference[]> = {
+  LN0: [
+    {
+      fields: [
+        {
+          to: "id",
+          from: "lnType",
+        },
+        {
+          to: "lnClass",
+          from: "lnClass",
+        },
+      ],
+      to: ":scope>DataTypeTemplates>LNodeType",
+      from: ":scope>IED>AccessPoint>Server>LDevice>LN0",
+      scope: "SCL",
+    },
+  ],
+  LN: [
+    {
+      fields: [
+        {
+          to: "id",
+          from: "lnType",
+        },
+        {
+          to: "lnClass",
+          from: "lnClass",
+        },
+      ],
+      to: ":scope>DataTypeTemplates>LNodeType",
+      from: ":scope>IED>AccessPoint>LN",
+      scope: "SCL",
+    },
+    {
+      fields: [
+        {
+          to: "id",
+          from: "lnType",
+        },
+        {
+          to: "lnClass",
+          from: "lnClass",
+        },
+      ],
+      to: ":scope>DataTypeTemplates>LNodeType",
+      from: ":scope>IED>AccessPoint>Server>LDevice>LN",
+      scope: "SCL",
+    },
+  ],
+  ServerAt: [
+    {
+      fields: [
+        {
+          to: "name",
+          from: "apName",
+        },
+      ],
+      to: ":scope>AccessPoint",
+      from: ":scope>AccessPoint>ServerAt",
+      scope: "IED",
+    },
+  ],
+  LogControl: [
+    {
+      fields: [
+        {
+          to: "name",
+          from: "datSet",
+        },
+      ],
+      to: ":scope>DataSet",
+      from: ":scope>LogControl",
+      scope: "LN",
+    },
+    {
+      fields: [
+        {
+          to: "name",
+          from: "datSet",
+        },
+      ],
+      to: ":scope>DataSet",
+      from: ":scope>LogControl",
+      scope: "LN0",
+    },
+  ],
+  /* ConnectedAP: [
+    {
+      fields: [
+        {
+          to: "name",
+          from: "iedName",
+        },
+      ],
+      to: ":scope>IED",
+      from: ":scope>Communication>SubNetwork>ConnectedAP",
+      scope: "SCL",
+    },
+  ], */
+  DO: [
+    {
+      fields: [
+        {
+          to: "id",
+          from: "type",
+        },
+      ],
+      to: ":scope>DOType",
+      from: ":scope>LNodeType>DO",
+      scope: "DataTypeTemplates",
+    },
+  ],
+  SDO: [
+    {
+      fields: [
+        {
+          to: "id",
+          from: "type",
+        },
+      ],
+      to: ":scope>DOType",
+      from: ":scope>DOType>SDO",
+      scope: "DataTypeTemplates",
+    },
+  ],
+  BDA: [
+    {
+      fields: [
+        {
+          to: "id",
+          from: "type",
+        },
+      ],
+      to: ":scope>DAType, :scope>EnumType",
+      from: ":scope>DOType>DA,                                              \n          :scope>DAType>BDA",
+      scope: "DataTypeTemplates",
+    },
+  ],
+  /* Terminal: [
+    {
+      fields: [
+        {
+          to: "name",
+          from: "substationName",
+        },
+      ],
+      to: ":scope>Substation, :scope>Process,                          \n               :scope>Line",
+      from: ":scope Terminal",
+      scope: "SCL",
+    },
+  ], */
+  SampledValueControl: [
+    {
+      fields: [
+        {
+          to: "name",
+          from: "datSet",
+        },
+      ],
+      to: ":scope>DataSet",
+      from: ":scope>SampledValueControl",
+      scope: "LN0",
+    },
+  ],
+  GSEControl: [
+    {
+      fields: [
+        {
+          to: "name",
+          from: "datSet",
+        },
+      ],
+      to: ":scope>DataSet",
+      from: ":scope>GSEControl",
+      scope: "LN0",
+    },
+  ],
+  DA: [
+    {
+      fields: [
+        {
+          to: "id",
+          from: "type",
+        },
+      ],
+      to: ":scope>DAType, :scope>EnumType",
+      from: ":scope>DOType>DA, :scope>DAType>BDA",
+      scope: "DataTypeTemplates",
+    },
+  ],
+  ReportControl: [
+    {
+      fields: [
+        {
+          to: "name",
+          from: "datSet",
+        },
+      ],
+      to: ":scope>DataSet",
+      from: ":scope>ReportControl",
+      scope: "LN",
+    },
+    {
+      fields: [
+        {
+          to: "name",
+          from: "datSet",
+        },
+      ],
+      to: ":scope>DataSet",
+      from: ":scope>ReportControl",
+      scope: "LN0",
+    },
+  ],
+};
+
+const defaults: Record<string, Record<string, string>> = {
+  SubNetwork: {
+    desc: "",
+  },
+  DAI: {
+    desc: "",
+  },
+  ConfDataSet: {
+    modify: "true",
+  },
+  SMV: {
+    desc: "",
+  },
+  NeutralPoint: {
+    desc: "",
+    name: "",
+  },
+  Function: {
+    desc: "",
+  },
+  AccessPoint: {
+    clock: "false",
+    desc: "",
+    kdc: "false",
+    router: "false",
+  },
+  LNode: {
+    desc: "",
+    iedName: "None",
+    ldInst: "",
+    lnInst: "",
+    prefix: "",
+  },
+  ServerAt: {
+    desc: "",
+  },
+  Inputs: {
+    desc: "",
+  },
+  DOType: {
+    desc: "",
+    iedType: "",
+  },
+  LogControl: {
+    bufTime: "0",
+    desc: "",
+    intgPd: "0",
+    lnClass: "LLN0",
+    logEna: "true",
+    prefix: "",
+    reasonCode: "true",
+  },
+  SubEquipment: {
+    desc: "",
+    phase: "none",
+    virtual: "false",
+  },
+  Server: {
+    certificate: "false",
+    desc: "",
+    none: "true",
+    password: "false",
+    strong: "false",
+    timeout: "30",
+    weak: "false",
+  },
+  SMVSettings: {
+    cbName: "Fix",
+    synchSrcId: "false",
+    samplesPerSec: "false",
+    nofASDU: "Fix",
+    kdaParticipant: "false",
+    optFields: "Fix",
+    datSet: "Fix",
+    svID: "Fix",
+    pdcTimeStamp: "false",
+    smpRate: "Fix",
+  },
+  FCDA: {
+    prefix: "",
+  },
+  ConnectedAP: {
+    desc: "",
+  },
+  Header: {
+    nameStructure: "IEDName",
+    revision: "",
+  },
+  ConfReportControl: {
+    bufConf: "false",
+    bufMode: "both",
+  },
+  DO: {
+    desc: "",
+    transient: "false",
+  },
+  SMVsc: {
+    delivery: "multicast",
+    deliveryConf: "false",
+    rSV: "false",
+    sv: "true",
+  },
+  ReportSettings: {
+    cbName: "Fix",
+    bufTime: "Fix",
+    intgPd: "Fix",
+    trgOps: "Fix",
+    rptID: "Fix",
+    optFields: "Fix",
+    datSet: "Fix",
+    resvTms: "false",
+    owner: "false",
+  },
+  IED: {
+    desc: "",
+    engRight: "full",
+    originalSclRelease: "1",
+    originalSclRevision: "A",
+    originalSclVersion: "2003",
+  },
+  DataSet: {
+    desc: "",
+  },
+  Communication: {
+    desc: "",
+  },
+  ConfLNs: {
+    fixLnInst: "false",
+    fixPrefix: "false",
+  },
+  SDO: {
+    count: "0",
+    desc: "",
+  },
+  EqFunction: {
+    desc: "",
+  },
+  GeneralEquipment: {
+    desc: "",
+    virtual: "false",
+  },
+  BDA: {
+    count: "0",
+    desc: "",
+    valImport: "false",
+    valKind: "Set",
+  },
+  Terminal: {
+    desc: "",
+    name: "",
+  },
+  Log: {
+    desc: "",
+  },
+  SettingGroups: {
+    resvTms: "false",
+  },
+  ClientServices: {
+    rSV: "false",
+    supportsLdName: "false",
+    unbufReport: "false",
+    readLog: "false",
+    gsse: "false",
+    bufReport: "false",
+    noIctBinding: "false",
+    sv: "false",
+    rGOOSE: "false",
+    goose: "false",
+  },
+  Line: {
+    desc: "",
+  },
+  DOI: {
+    desc: "",
+  },
+  McSecurity: {
+    encryption: "false",
+    signature: "false",
+  },
+  SMVSecurity: {
+    desc: "",
+  },
+  LogSettings: {
+    cbName: "Fix",
+    datSet: "Fix",
+    intgPd: "Fix",
+    logEna: "Fix",
+    trgOps: "Fix",
+  },
+  SettingControl: {
+    actSG: "1",
+    desc: "",
+  },
+  RedProt: {
+    hsr: "false",
+    prp: "false",
+    rstp: "false",
+  },
+  SDI: {
+    desc: "",
+  },
+  EnumType: {
+    desc: "",
+  },
+  TapChanger: {
+    desc: "",
+    virtual: "false",
+  },
+  DAType: {
+    desc: "",
+    iedType: "",
+  },
+  TrgOps: {
+    dchg: "false",
+    dupd: "false",
+    gi: "true",
+    period: "false",
+    qchg: "false",
+  },
+  TimeSyncProt: {
+    c37_238: "false",
+    iec61850_9_3: "false",
+    other: "false",
+    sntp: "true",
+  },
+  SampledValueControl: {
+    refreshTime: "false",
+    dataSet: "false",
+    smpMod: "SmpPerPeriod",
+    multicast: "true",
+    desc: "",
+    security: "false",
+    sampleRate: "false",
+    synchSourceId: "false",
+    timestamp: "false",
+    securityEnable: "None",
+  },
+  ConductingEquipment: {
+    desc: "",
+    virtual: "false",
+  },
+  GSE: {
+    desc: "",
+  },
+  FileHandling: {
+    ftp: "false",
+    ftps: "false",
+    mms: "true",
+  },
+  GOOSE: {
+    fixedOffs: "false",
+    goose: "true",
+    rGOOSE: "false",
+  },
+  EqSubFunction: {
+    desc: "",
+  },
+  Substation: {
+    desc: "",
+  },
+  GSEControl: {
+    desc: "",
+    fixedOffs: "false",
+    securityEnable: "None",
+    type: "GOOSE",
+  },
+  ConnectivityNode: {
+    desc: "",
+  },
+  Services: {
+    nameLength: "32",
+  },
+  SubFunction: {
+    desc: "",
+  },
+  LDevice: {
+    desc: "",
+  },
+  Bay: {
+    desc: "",
+  },
+  GOOSESecurity: {
+    desc: "",
+  },
+  ValueHandling: {
+    setToRO: "false",
+  },
+  DA: {
+    count: "0",
+    dchg: "false",
+    desc: "",
+    dupd: "false",
+    qchg: "false",
+    valImport: "false",
+    valKind: "Set",
+  },
+  TransformerWinding: {
+    desc: "",
+    virtual: "false",
+  },
+  EnumVal: {
+    desc: "",
+  },
+  RptEnabled: {
+    desc: "",
+    max: "1",
+  },
+  GSESettings: {
+    appID: "Fix",
+    cbName: "Fix",
+    datSet: "Fix",
+    dataLabel: "Fix",
+    kdaParticipant: "false",
+  },
+  PowerTransformer: {
+    desc: "",
+    virtual: "false",
+  },
+  CommProt: {
+    ipv6: "false",
+  },
+  PhysConn: {
+    desc: "",
+  },
+  VoltageLevel: {
+    desc: "",
+  },
+  Association: {
+    prefix: "",
+  },
+  Process: {
+    desc: "",
+  },
+  ProtNs: {
+    type: "8-MMS",
+  },
+  Voltage: {
+    multiplier: "",
+  },
+  ReportControl: {
+    indexed: "true",
+    dataSet: "false",
+    buffered: "false",
+    desc: "",
+    bufTime: "0",
+    bufOvfl: "true",
+    intgPd: "0",
+    entryID: "false",
+    reasonCode: "false",
+    dataRef: "false",
+    timeStamp: "false",
+    seqNum: "false",
+    configRef: "false",
+  },
+  ClientLN: {
+    prefix: "",
+  },
+  LNodeType: {
+    desc: "",
+    iedType: "",
+  },
+  LN: {
+    desc: "",
+    prefix: "",
+  },
+};
 
 export function hasher(
   db: HashDB,
@@ -80,20 +690,21 @@ export function hasher(
   function describeAttributes(e: Element) {
     const description: Record<string, string | number | boolean> = {};
 
-    const { int, bool, defaults } = attributes;
-
     Array.from(e.attributes)
       .map((a) => a.localName)
       .filter((a) => !ignoreAttrs.has(a))
       .filter((a) => !ignoreAttrs.has(e.tagName + "." + a))
+      .filter(
+        (a) =>
+          !((e.tagName in identifiers && a in identifiers[e.tagName]) ?? []),
+      )
       .sort()
       .forEach((name) => {
-        if (name in defaults) description[name] = defaults[name];
-        let val: string | number | boolean | null = e.getAttribute(name);
+        if (e.tagName in defaults && name in defaults[e.tagName])
+          description[name] = defaults[e.tagName][name];
+        const val = e.getAttribute(name);
         if (!val) return;
-        if (int.includes(name)) val = Number.parseInt(val ?? "", 10);
-        if (bool.includes(name)) val = isXmlTrue(val as string);
-        description[name] = val;
+        description[name] = val.trim();
       });
 
     return description;
@@ -112,13 +723,38 @@ export function hasher(
     return description;
   }
 
+  function describeReferences(e: Element) {
+    const description: Record<string, string[]> = {};
+    if (!(e.tagName in references)) return description;
+
+    references[e.tagName].forEach(({ fields, to, scope }) => {
+      const candidates = Array.from(
+        e.closest(scope)?.querySelectorAll(to) ?? [],
+      );
+      const hashes = candidates
+        .filter((toE) => {
+          const toAttrs = fields.map((f) => f.to);
+          const fromAttrs = fields.map((f) => f.from);
+          const toVals = toAttrs.map((a) => toE.getAttribute(a));
+          const fromVals = fromAttrs.map((a) => e.getAttribute(a));
+          return fromVals.every((val, i) => toVals[i] === val) && toE;
+        })
+        .map(hash)
+        .sort();
+      if (hashes.length) description["@" + to] = hashes;
+    });
+
+    return description;
+  }
+
   function describeNaming(e: Element) {
-    const children = Array.from(e.children)
+    const childTags = Array.from(e.children)
       .map((c) => c.tagName)
       .filter((c, i, arr) => arr.indexOf(c) === i);
     const description: Record<string, unknown> = {
       ...describeAttributes(e),
-      ...describeChildren(e, ...children),
+      ...describeChildren(e, ...childTags),
+      ...describeReferences(e),
     };
     const eNSAttrs = Array.from(e.attributes).filter((a) => a.namespaceURI);
     if (eNSAttrs.length) {
@@ -206,22 +842,22 @@ export function hasher(
     }),
     IED: (e) => describeNaming(e),
     LDevice: describeNaming,
-    LN0: (e) => ({
+    /* LN0: (e) => ({
       ...describeAttributes(e),
       ["@LNodeType"]: Array.from(
         e.ownerDocument.querySelectorAll(
           `DataTypeTemplates > LNodeType[id="${e.getAttribute("lnType")}"]`,
         ),
       ).map(hash),
-    }),
-    LN: (e) => ({
+    }), */
+    /* LN: (e) => ({
       ...describeAttributes(e),
       ["@LNodeType"]: Array.from(
         e.ownerDocument.querySelectorAll(
           `DataTypeTemplates > LNodeType[id="${e.getAttribute("lnType")}"]`,
         ),
       ).map(hash),
-    }),
+    }), */
     LNodeType: (e) => ({
       ...describeNaming(e),
     }),
@@ -244,7 +880,9 @@ export function hasher(
   function describe(e: Element) {
     if (e.tagName in descriptions) return descriptions[e.tagName](e);
     else if (e.tagName === "Private") return { xml: e.outerHTML };
-    return describeNaming(e);
+    else if (e.namespaceURI === "http://www.iec.ch/61850/2003/SCL")
+      describeNaming(e);
+    return { xml: e.outerHTML };
   }
 
   function hash(e: Element): string {

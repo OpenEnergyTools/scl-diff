@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<title>OpenSCD Core Demo</title>
+<title>OpenSCD Diff Demo</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@300;400;500&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined">
+
+<oscd-diff></oscd-diff>
+
+<hr>
+
 <label for="scl1">SCL file 1</label>
-<input type="file" id="scl1" name="scl1" accept="application/xml" />
+<input type="file" id="scl1" name="scl1" accept="application/xml" multiple />
 
 <hr>
 
@@ -11,8 +16,19 @@
 </div>
 
 <script type="module">
+  import OpenSCDDiffElement from "../dist/oscd-diff.js"
+  customElements.define('oscd-diff', OpenSCDDiffElement);
+</script>
+
+<script type="module">
   import { newHasher } from '../dist/hash.js';
   import { identity } from '@openenergytools/scl-lib';
+
+  const oscdDiff = document.querySelector('oscd-diff');
+
+window.docs = {};
+
+oscdDiff.docs = window.docs;
 
 const scl1 = document.getElementById('scl1');
 const result = document.getElementById('result');
@@ -75,11 +91,15 @@ function display(description) {
 scl1.addEventListener('change', e => {
   for (const file of scl1.files) {
     file.text().then(text => {
-    const t0 = (new Date().getTime());
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'application/xml');
+    const sclElement = doc.documentElement;
+      docs[file.name] = doc;
+      oscdDiff.requestUpdate();
+      return;
+    console.time('hash ' + file.name);
       console.log(hash(new DOMParser().parseFromString(text, 'application/xml').documentElement))
-    const t1 = (new Date().getTime());
-    console.warn((t1 - t0) / 60000, 'min')
-    console.warn((t1 - t0) / 1000, 'sec')
+      console.timeEnd('hash ' + file.name);
       Object.entries(db.SCL).forEach(([sclHash, description]) => {
         const details = document.createElement('details');
         const summary = document.createElement('summary');

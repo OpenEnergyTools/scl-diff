@@ -29,7 +29,7 @@ function siblingCount(element: Element, name: string): number {
   return parseInt(count, 10);
 }
 
-interface ElementDB {
+export interface ElementDB {
   e2h: WeakMap<Element, string>;
   h2e: Map<string, Set<Element>>;
 }
@@ -881,7 +881,7 @@ export function hasher(
     if (e.tagName in descriptions) return descriptions[e.tagName](e);
     else if (e.tagName === "Private") return { xml: e.outerHTML };
     else if (e.namespaceURI === "http://www.iec.ch/61850/2003/SCL")
-      describeNaming(e);
+      return describeNaming(e);
     return { xml: e.outerHTML };
   }
 

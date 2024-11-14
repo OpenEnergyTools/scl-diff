@@ -1,10 +1,17 @@
-import { LitElement, html, nothing } from "lit";
+import { LitElement, html, css, nothing } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { identity, find } from "@openenergytools/scl-lib";
 
 import "@material/web/all.js";
 
 import type { newHasher } from "./hash.js";
+
+function filterObject(
+  obj: object,
+  predicate: (entry: [string, any]) => boolean,
+) {
+  return Object.fromEntries(Object.entries(obj).filter(predicate));
+}
 
 type Description = Record<string, string | string[]> & {
   eNS?: Record<string, Record<string, string>>;
@@ -107,7 +114,7 @@ export class DiffTree extends LitElement {
   }
 
   get diff(): Record<string, { ours?: any; theirs?: any }> {
-    return getDiff(this.ourDescription!, this.theirDescription!);
+    return getDiff(this.ourDescription ?? {}, this.theirDescription ?? {});
   }
 
   renderChildDiffs() {
@@ -138,7 +145,6 @@ export class DiffTree extends LitElement {
           elementDiff[id] ??= {};
           elementDiff[id].theirs = element;
         });
-        console.warn(elementDiff);
         return Object.entries(elementDiff).map(([id, { ours, theirs }]) => {
           return html`<diff-tree
             .ours=${ours}
@@ -150,35 +156,170 @@ export class DiffTree extends LitElement {
     </div>`;
   }
 
+  renderAttributeDiff() {
+    const attrDiff = filterObject(
+      this.diff,
+      ([key]) => !key.startsWith("@") && key !== "eNS",
+    );
+    const eNSDiff = this.diff.eNS;
+    if (!Object.keys(attrDiff).length && !eNSDiff) return nothing;
+    return html`<table>
+      ${Object.entries(attrDiff).map(
+        ([name, { ours, theirs }]) =>
+          html`<tr>
+            <td></td>
+            <td>${name}</td>
+            <td>${ours}</td>
+            <td>${theirs}</td>
+          </tr>`,
+      )}
+      ${Object.entries(eNSDiff ?? {}).map(([ns, ks]) =>
+        Object.entries(ks).map(
+          ([k, d]) =>
+            html`<tr>
+              <td>${ns}</td>
+              <td>${k}</td>
+              <td>${(d as { ours: string }).ours}</td>
+              <td>${(d as { theirs: string }).theirs}</td>
+            </tr>`,
+        ),
+      )},
+    </table>`;
+  }
+
   renderDiff() {
-    return html`<pre>
-${JSON.stringify(this.diff, null, 2)}
-</pre>
-      ${this.renderChildDiffs()}`;
+    return html`${this.renderAttributeDiff()}${this.renderChildDiffs()}`;
+  }
+
+  renderElement() {
+    const element = this.ours ?? this.theirs;
+    if (!element) return nothing;
+    const id = identity(element);
+    const tag = element.tagName;
+    const description = this.ourDescription ?? this.theirDescription;
+    const hash = this.ourHash ?? this.theirHash;
+    return html`<md-icon-button toggle @click=${() => this.requestUpdate()}>
+        <md-icon>unfold_more</md-icon>
+        <md-icon slot="selected">unfold_less</md-icon>
+      </md-icon-button>
+      <p>${this.ours ? "-" : "+"} ${id}</p>
+      ${this.expanded ? this.renderDiff() : ""} `;
   }
 
   render() {
-    if (!this.ours || !this.theirs)
-      return html`<h2>missing ${this.ours ? "their" : "our"} element</h2>`;
+    if (!this.ours && !this.theirs)
+      return html`<p>missing ${this.ours ? "their" : "our"} element</p>`;
+    if (!this.ours || !this.theirs) return this.renderElement();
     if (!this.ourHasher || !this.theirHasher)
-      return html`<h2>missing ${this.ourHasher ? "their" : "our"} hasher</h2>`;
+      return html`<p>missing ${this.ourHasher ? "their" : "our"} hasher</p>`;
     if (!this.ourDescription || !this.theirDescription)
-      return html`<h2>
+      return html`<p>
         missing ${this.ourDescription ? "their" : "our"} description
-      </h2>`;
+      </p>`;
     if (this.ourHash === this.theirHash) return nothing;
 
     Object.keys(this.ourDescription ?? {}).forEach((key) => {});
 
-    return html`<h2>
-        ${identity(this.ours) || this.ours.tagName}
-        <md-icon>arrow_forward</md-icon> ${identity(this.theirs) ||
-        this.theirs.tagName}
-      </h2>
-      <md-icon-button toggle @click=${() => this.requestUpdate()}>
+    return html`<md-icon-button toggle @click=${() => this.requestUpdate()}>
         <md-icon>unfold_more</md-icon>
         <md-icon slot="selected">unfold_less</md-icon>
       </md-icon-button>
+      <p>
+        ${identity(this.ours) || this.ours.tagName}
+        <md-icon style="--md-icon-size: 1em">arrow_forward</md-icon> ${identity(
+          this.theirs,
+        ) || this.theirs.tagName}
+      </p>
       ${this.expanded ? this.renderDiff() : ""} `;
   }
+
+  static styles = css`
+    md-icon-button {
+      float: left;
+      transform: scale(0.6);
+    }
+    div {
+      margin-left: 1em;
+    }
+    pre {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    * {
+      margin-top: 0px;
+    }
+
+    i {
+      color: #555a;
+    }
+    th {
+      font-weight: 300;
+      opacity: 0.8;
+      width: 1%;
+      white-space: nowrap;
+    }
+    th:first-child {
+      text-align: right;
+      color: var(--oscd-base1);
+      padding-right: 0.5em;
+    }
+    td.arrow {
+      width: 2em;
+      text-align: center;
+      color: var(--oscd-base1);
+    }
+    .odd > table > tr > th:first-child,
+    td.arrow {
+      color: var(--oscd-base0);
+    }
+    th:nth-child(2) {
+      text-align: left;
+      color: var(--oscd-base0);
+      background: var(--oscd-base2);
+      padding-right: 1em;
+    }
+    table td:nth-child(3) {
+      text-align: right;
+    }
+    td:nth-child(5) {
+      text-align: left;
+    }
+    tr:nth-child(2n) td,
+    tr:nth-child(2n) th {
+      background: var(--oscd-base2);
+    }
+    tr:nth-child(2n + 1) td,
+    tr:nth-child(2n + 1) th {
+      background: var(--oscd-base3);
+    }
+    table {
+      border: 0.25em solid var(--oscd-base2);
+      table-layout: auto;
+      border-collapse: collapse;
+      width: max-content;
+      margin-left: 1.2em;
+      margin-bottom: 0.3em;
+      background: none;
+    }
+    * {
+      cursor: default;
+      --oscd-primary: var(--oscd-theme-primary, #2aa198);
+      --oscd-secondary: var(--oscd-theme-secondary, #6c71c4);
+      --oscd-error: var(--oscd-theme-error, #dc322f);
+      --oscd-base03: var(--oscd-theme-base03, #002b36);
+      --oscd-base02: var(--oscd-theme-base02, #073642);
+      --oscd-base01: var(--oscd-theme-base01, #586e75);
+      --oscd-base00: var(--oscd-theme-base00, #657b83);
+      --oscd-base0: var(--oscd-theme-base0, #839496);
+      --oscd-base1: var(--oscd-theme-base1, #93a1a1);
+      --oscd-base2: var(--oscd-theme-base2, #eee8d5);
+      --oscd-base3: var(--oscd-theme-base3, #fdf6e3);
+      --oscd-text-font: var(--oscd-theme-text-font, "Roboto");
+    }
+    :host {
+      font-family: var(--oscd-text-font);
+      display: block;
+      padding: 0.5rem;
+    }
+  `;
 }

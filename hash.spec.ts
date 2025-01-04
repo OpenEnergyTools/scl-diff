@@ -183,6 +183,7 @@ describe("hasher", () => {
     );
     expect(description).property("@Text").to.have.lengthOf(1);
     const text = db.Text[description["@Text"][0]];
+    console.log(JSON.stringify(text, null, 2));
     expect(text).to.exist.and.to.have.property(
       "xml",
       baseEnumType.querySelector("Text")?.outerHTML,

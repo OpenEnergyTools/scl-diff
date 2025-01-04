@@ -29,7 +29,7 @@ function getDiff(ours: Description, theirs: Description) {
       diff[key] = { ours: ours[key], theirs: theirs[key] };
     else if (Array.isArray(val)) {
       const arrayDiff = { ours: [] as string[], theirs: [] as string[] };
-      const vals = new Set([...ours[key], ...theirs[key]]);
+      const vals = new Set([...(ours[key] ?? []), ...(theirs[key] ?? [])]);
       vals.forEach((val) => {
         const inOurs = ours[key]?.includes(val);
         const inTheirs = theirs[key]?.includes(val);
@@ -82,9 +82,8 @@ export class DiffTree extends LitElement {
   >();
   @query("md-icon-button") expandButton!: HTMLElement;
 
-  get expanded(): boolean {
-    return this.expandButton?.hasAttribute("selected");
-  }
+  @property({ type: Boolean })
+  expanded = false;
 
   get ourHasher(): ReturnType<typeof newHasher> | undefined {
     return this.ours ? this.hashers.get(this.ours.ownerDocument) : undefined;
@@ -145,11 +144,13 @@ export class DiffTree extends LitElement {
           elementDiff[id] ??= {};
           elementDiff[id].theirs = element;
         });
+        const expanded = Object.keys(elementDiff).length === 1;
         return Object.entries(elementDiff).map(([id, { ours, theirs }]) => {
           return html`<diff-tree
             .ours=${ours}
             .theirs=${theirs}
             .hashers=${this.hashers}
+            .expanded=${expanded}
           ></diff-tree>`;
         });
       })}
@@ -170,6 +171,7 @@ export class DiffTree extends LitElement {
             <td></td>
             <td>${name}</td>
             <td>${ours}</td>
+            <td class="arrow">→</td>
             <td>${theirs}</td>
           </tr>`,
       )}
@@ -180,10 +182,11 @@ export class DiffTree extends LitElement {
               <td>${ns}</td>
               <td>${k}</td>
               <td>${(d as { ours: string }).ours}</td>
+              <td class="arrow">→</td>
               <td>${(d as { theirs: string }).theirs}</td>
             </tr>`,
         ),
-      )},
+      )}
     </table>`;
   }
 
@@ -194,15 +197,14 @@ export class DiffTree extends LitElement {
   renderElement() {
     const element = this.ours ?? this.theirs;
     if (!element) return nothing;
-    const id = identity(element);
+    const id = identity(element) || element.tagName;
     const tag = element.tagName;
     const description = this.ourDescription ?? this.theirDescription;
     const hash = this.ourHash ?? this.theirHash;
-    return html`<md-icon-button toggle @click=${() => this.requestUpdate()}>
-        <md-icon>unfold_more</md-icon>
-        <md-icon slot="selected">unfold_less</md-icon>
-      </md-icon-button>
-      <p>${this.ours ? "-" : "+"} ${id}</p>
+    return html`<a @click=${() => (this.expanded = !this.expanded)}
+        ><md-icon>${this.expanded ? "arrow_drop_down" : "arrow_right"}</md-icon>
+        ${this.ours ? "-" : "+"} ${id}</a
+      >
       ${this.expanded ? this.renderDiff() : ""} `;
   }
 
@@ -220,23 +222,17 @@ export class DiffTree extends LitElement {
 
     Object.keys(this.ourDescription ?? {}).forEach((key) => {});
 
-    return html`<md-icon-button toggle @click=${() => this.requestUpdate()}>
-        <md-icon>unfold_more</md-icon>
-        <md-icon slot="selected">unfold_less</md-icon>
-      </md-icon-button>
-      <p>
-        ${identity(this.ours) || this.ours.tagName}
-        <md-icon style="--md-icon-size: 1em">arrow_forward</md-icon> ${identity(
-          this.theirs,
-        ) || this.theirs.tagName}
-      </p>
+    return html`<a @click=${() => (this.expanded = !this.expanded)}
+        ><md-icon>${this.expanded ? "arrow_drop_down" : "arrow_right"}</md-icon>
+        ${identity(this.ours) || this.ours.tagName}</a
+      >
       ${this.expanded ? this.renderDiff() : ""} `;
   }
 
   static styles = css`
-    md-icon-button {
-      float: left;
-      transform: scale(0.6);
+    md-icon {
+      position: relative;
+      top: 6px;
     }
     div {
       margin-left: 1em;
@@ -296,7 +292,7 @@ export class DiffTree extends LitElement {
       border: 0.25em solid var(--oscd-base2);
       table-layout: auto;
       border-collapse: collapse;
-      width: max-content;
+      max-width: 100%;
       margin-left: 1.2em;
       margin-bottom: 0.3em;
       background: none;

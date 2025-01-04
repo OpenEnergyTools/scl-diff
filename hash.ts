@@ -741,7 +741,7 @@ export function hasher(
         })
         .map(hash)
         .sort();
-      if (hashes.length) description["@" + to] = hashes;
+      if (hashes.length) description["@" + to.split(">").pop()] = hashes;
     });
 
     return description;

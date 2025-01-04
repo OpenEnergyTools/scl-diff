@@ -25,8 +25,7 @@ export default class OscdDiff extends LitElement {
   hashers = new WeakMap<XMLDocument, ReturnType<typeof newHasher>>();
 
   render() {
-    return html`<h1>diff</h1>
-      <table>
+    return html`<table>
         <tr>
           <td>
             <select id="doc1">

@@ -25,18 +25,18 @@
     "build": "npx rimraf dist && tsc"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.1",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "@web/dev-server-esbuild": "^0.4.1",
-    "@web/test-runner": "^0.16.1",
+    "@types/mocha": "^10.0.9",
+    "@typescript-eslint/eslint-plugin": "^8.12.2",
+    "@typescript-eslint/parser": "^8.12.2",
+    "@web/dev-server-esbuild": "^1.0.2",
+    "@web/test-runner": "^0.19.0",
     "chai": "npm:@esm-bundle/chai@^4.3.4-fix.0",
-    "concurrently": "^8.0.1",
-    "eslint": "^8.40.0",
-    "gh-pages": "^5.0.0",
-    "prettier": "^3.2.5",
-    "typedoc": "^0.24.7",
-    "typescript": "^5.0.4"
+    "concurrently": "^9.1.0",
+    "eslint": "^9.14.0",
+    "gh-pages": "^6.2.0",
+    "prettier": "^3.3.3",
+    "typedoc": "^0.26.11",
+    "typescript": "^5.6.3"
   },
   "eslintConfig": {
     "plugins": [
@@ -55,7 +55,9 @@
     "root": true
   },
   "dependencies": {
-    "@openenergytools/scl-lib": "^0.13.3",
+    "@material/web": "^2.2.0",
+    "@openenergytools/scl-lib": "^1.0.0",
+    "lit": "^3.2.1",
     "xxhash-wasm": "^1.0.2"
   }
 }

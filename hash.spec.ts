@@ -173,7 +173,7 @@ describe("hasher", () => {
     const description = db.EnumType[digest] as Record<string, string[]>;
     expect(description).property("@EnumVal").to.have.lengthOf(1);
     const val = db.EnumVal[description["@EnumVal"][0]];
-    expect(val).to.exist.and.to.have.property("ord", 1);
+    expect(val).to.exist.and.to.have.property("ord", "1");
     expect(val).to.have.property("val", "A");
     expect(description).property("@Private").to.have.lengthOf(1);
     const priv = db.Private[description["@Private"][0]];
@@ -183,6 +183,7 @@ describe("hasher", () => {
     );
     expect(description).property("@Text").to.have.lengthOf(1);
     const text = db.Text[description["@Text"][0]];
+    console.log(JSON.stringify(text, null, 2));
     expect(text).to.exist.and.to.have.property(
       "xml",
       baseEnumType.querySelector("Text")?.outerHTML,

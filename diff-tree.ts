@@ -80,6 +80,11 @@ export class DiffTree extends LitElement {
     XMLDocument,
     ReturnType<typeof newHasher>
   >();
+  @property({ type: Number }) depth = 0;
+  @property({ type: Boolean, reflect: true })
+  get odd(): boolean {
+    return this.depth % 2 === 1;
+  }
   @query("md-icon-button") expandButton!: HTMLElement;
 
   @property({ type: Boolean })
@@ -151,6 +156,7 @@ export class DiffTree extends LitElement {
             .theirs=${theirs}
             .hashers=${this.hashers}
             .expanded=${expanded}
+            .depth=${this.depth + 1}
           ></diff-tree>`;
         });
       })}
@@ -167,23 +173,25 @@ export class DiffTree extends LitElement {
     return html`<table>
       ${Object.entries(attrDiff).map(
         ([name, { ours, theirs }]) =>
-          html`<tr>
-            <td></td>
-            <td>${name}</td>
-            <td>${ours}</td>
-            <td class="arrow">→</td>
-            <td>${theirs}</td>
+          html`<tr tabindex="0">
+            <th></th>
+            <th>${name}</th>
+            <td><span>${ours}</span></td>
+            <td><span>${theirs}</span></td>
           </tr>`,
       )}
       ${Object.entries(eNSDiff ?? {}).map(([ns, ks]) =>
-        Object.entries(ks).map(
-          ([k, d]) =>
-            html`<tr>
-              <td>${ns}</td>
-              <td>${k}</td>
-              <td>${(d as { ours: string }).ours}</td>
-              <td class="arrow">→</td>
-              <td>${(d as { theirs: string }).theirs}</td>
+        (
+          Object.entries(ks) as [string, { ours: string; theirs: string }][]
+        ).map(
+          ([k, { ours, theirs }]) =>
+            html`<tr tabindex="0">
+              <th>${ns}</th>
+              <th>${k}</th>
+              <td><span>${ours}</span></td>
+              <td>
+                <span>${theirs}</span>
+              </td>
             </tr>`,
         ),
       )}
@@ -194,108 +202,116 @@ export class DiffTree extends LitElement {
     return html`${this.renderAttributeDiff()}${this.renderChildDiffs()}`;
   }
 
-  renderElement() {
-    const element = this.ours ?? this.theirs;
-    if (!element) return nothing;
-    const id = identity(element) || element.tagName;
-    const tag = element.tagName;
-    const description = this.ourDescription ?? this.theirDescription;
-    const hash = this.ourHash ?? this.theirHash;
-    return html`<a @click=${() => (this.expanded = !this.expanded)}
-        ><md-icon>${this.expanded ? "arrow_drop_down" : "arrow_right"}</md-icon>
-        ${this.ours ? "-" : "+"} ${id}</a
-      >
-      ${this.expanded ? this.renderDiff() : ""} `;
-  }
-
   render() {
-    if (!this.ours && !this.theirs)
-      return html`<p>missing ${this.ours ? "their" : "our"} element</p>`;
-    if (!this.ours || !this.theirs) return this.renderElement();
-    if (!this.ourHasher || !this.theirHasher)
-      return html`<p>missing ${this.ourHasher ? "their" : "our"} hasher</p>`;
-    if (!this.ourDescription || !this.theirDescription)
-      return html`<p>
-        missing ${this.ourDescription ? "their" : "our"} description
-      </p>`;
     if (this.ourHash === this.theirHash) return nothing;
 
-    Object.keys(this.ourDescription ?? {}).forEach((key) => {});
+    const element = this.ours ?? this.theirs;
+    if (!element) return nothing;
+    let id = (<string>(identity(element) || element.tagName)).split(">").pop();
+    let style = `top: ${this.depth * 24}px; z-index: ${10000 - this.depth};`;
+    if (!this.ours) style += "color: var(--oscd-primary);";
+    if (!this.theirs) style += "color: var(--oscd-error);";
+    let desc = element.getAttribute("desc") || "";
+    if (desc) desc = `: ${desc}`;
+    if (id !== element.tagName) desc = `${element.tagName}${desc}`;
 
-    return html`<a @click=${() => (this.expanded = !this.expanded)}
+    return html`<a
+        style="${style}"
+        @click=${() => (this.expanded = !this.expanded)}
         ><md-icon>${this.expanded ? "arrow_drop_down" : "arrow_right"}</md-icon>
-        ${identity(this.ours) || this.ours.tagName}</a
+        ${id} <small>${desc}</small></a
       >
       ${this.expanded ? this.renderDiff() : ""} `;
   }
 
   static styles = css`
+    small {
+      font-size: 0.8em;
+      font-weight: 300;
+      color: var(--oscd-base0);
+    }
+    :host([odd]) small {
+      color: var(--oscd-base1);
+    }
     md-icon {
       position: relative;
       top: 6px;
     }
     div {
       margin-left: 1em;
-    }
-    pre {
-      max-width: 100%;
-      overflow-x: auto;
-    }
-    * {
-      margin-top: 0px;
-    }
-
-    i {
-      color: #555a;
+      margin-right: 1em;
     }
     th {
       font-weight: 300;
-      opacity: 0.8;
-      width: 1%;
-      white-space: nowrap;
+    }
+    td {
+      font-weight: 400;
     }
     th:first-child {
       text-align: right;
       color: var(--oscd-base1);
-      padding-right: 0.5em;
-    }
-    td.arrow {
-      width: 2em;
-      text-align: center;
-      color: var(--oscd-base1);
-    }
-    .odd > table > tr > th:first-child,
-    td.arrow {
-      color: var(--oscd-base0);
     }
     th:nth-child(2) {
       text-align: left;
       color: var(--oscd-base0);
-      background: var(--oscd-base2);
-      padding-right: 1em;
+      padding-left: 0.5em;
     }
     table td:nth-child(3) {
       text-align: right;
+      color: var(--oscd-error);
+      padding-left: 1em;
     }
-    td:nth-child(5) {
+    td:nth-child(4) {
       text-align: left;
+      color: var(--oscd-primary);
+      padding-left: 1em;
+    }
+    td:nth-child(4) {
+      text-align: left;
+      color: var(--oscd-primary);
+    }
+    span {
+      display: block;
+      transition: max-height 0.5s ease-in-out;
+    }
+    tr:not(:focus) span {
+      max-height: 60px;
+      overflow: hidden;
+    }
+    tr:not(:focus):hover span {
+      max-height: 120px;
+    }
+    tr:focus {
+      outline: 2px solid var(--oscd-secondary);
+      outline-offset: -2px;
     }
     tr:nth-child(2n) td,
     tr:nth-child(2n) th {
-      background: var(--oscd-base2);
+      background: var(--oscd-base3);
     }
     tr:nth-child(2n + 1) td,
     tr:nth-child(2n + 1) th {
+      background: var(--oscd-base2);
+    }
+    :host([odd]) tr:nth-child(2n) td,
+    :host([odd]) tr:nth-child(2n) th {
+      background: var(--oscd-base2);
+    }
+    :host([odd]) tr:nth-child(2n + 1) td,
+    :host([odd]) tr:nth-child(2n + 1) th {
       background: var(--oscd-base3);
     }
     table {
-      border: 0.25em solid var(--oscd-base2);
+      border: 0.25em solid var(--oscd-base3);
       table-layout: auto;
       border-collapse: collapse;
       max-width: 100%;
-      margin-left: 1.2em;
-      margin-bottom: 0.3em;
+      margin-left: 1em;
+      margin-right: 1em;
       background: none;
+    }
+    :host([odd]) table {
+      border: 0.25em solid var(--oscd-base2);
     }
     * {
       cursor: default;
@@ -315,7 +331,29 @@ export class DiffTree extends LitElement {
     :host {
       font-family: var(--oscd-text-font);
       display: block;
-      padding: 0.5rem;
+      background: var(--oscd-base2);
+      color: var(--oscd-base01);
+    }
+    :host(:last-child) {
+      border-bottom: 0.25em solid var(--oscd-base3);
+    }
+    :host([odd]:last-child) {
+      border-bottom: 0.25em solid var(--oscd-base2);
+    }
+    :host([odd]) {
+      background: var(--oscd-base3);
+      color: var(--oscd-base00);
+    }
+    a {
+      display: block;
+      text-decoration: none;
+      position: sticky;
+      background: var(--oscd-base2);
+      font-weight: 400;
+      padding-bottom: 4px;
+    }
+    :host([odd]) a {
+      background: var(--oscd-base3);
     }
   `;
 }
